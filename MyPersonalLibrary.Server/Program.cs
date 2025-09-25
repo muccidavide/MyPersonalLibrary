@@ -1,8 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using MyPersonalLibrary.Server.Endpoints;
+using MyPersonalLibrary.Server.Models.Context;
+using MyPersonalLibrary.Server.Services;
+using MyPersonalLibrary.Server.Profiles;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var connectionString = builder.Configuration.GetConnectionString("MyPersonalLibraryDB");
+builder.Services.AddDbContext<MyPersonalLibraryContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddAutoMapper(typeof(BookProfile));
 
 var app = builder.Build();
 
@@ -10,35 +21,15 @@ app.UseDefaultFiles();
 app.MapStaticAssets();
 
 // Configure the HTTP request pipeline.
+// http://localhost:5153/swagger/index.html
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "OpenAPI V1");
+    });
 }
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.MapFallbackToFile("/index.html");
-
+app.MapBookEndpoints();
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
