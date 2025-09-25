@@ -1,5 +1,3 @@
-
-
 # 📚 MyPersonalLibrary - Full-Stack Library Catalog
 
 ## Project Overview
@@ -59,23 +57,32 @@ The project employs a three-tier architecture:
 
 ### 1\. Database Setup
 
-1.  Create a new SQL database named `MyPersonalLibrary`.
-2.  Execute your database migration scripts or manually create the necessary tables (e.g., `Book`).
-3.  Update the connection string (`DefaultConnection`) in the API project's **`appsettings.json`** file to match your local setup.
+1.  Ensure your SQL server instance is running.
+2.  Navigate to the `SQL/` directory and execute the **`01_Schema.sql`** script to create the necessary tables (e.g., `[dbo].[book]`).
+3.  *Optional:* Execute the **`02_SeedData.sql`** script to populate the database with initial sample entries.
 
 ### 2\. Starting the Backend (.NET API)
+
+1.  Update the connection string (`DefaultConnection`) in the **`MyPersonalLibrary.Api/appsettings.json`** file to match your local SQL connection details.
+2.  Navigate to the API project directory and run the application:
+
+<!-- end list -->
 
 ```bash
 # Navigate to the API project directory
 cd MyPersonalLibrary.Api
 dotnet restore
-dotnet build
 dotnet run
 ```
 
 *The API will be running on [http://localhost:XXXX].*
 
 ### 3\. Starting the Frontend (Vue.js)
+
+1.  Navigate to the Frontend project directory:
+2.  Install dependencies and start the development server:
+
+<!-- end list -->
 
 ```bash
 # Navigate to the Frontend project directory
@@ -96,5 +103,3 @@ This project was developed to demonstrate the following technical skills:
   * **RESTful API Design:** Implementing clean and efficient data access endpoints using .NET.
   * **Frontend State Management:** Building a reactive UI with Vue.js, demonstrating efficient component design and data flow.
   * **Data Integration:** Practical application of database connectivity and manipulation (e.g., via Entity Framework Core).
-
------
