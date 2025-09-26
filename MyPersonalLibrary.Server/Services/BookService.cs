@@ -18,7 +18,7 @@ namespace MyPersonalLibrary.Server.Services
 
         public async Task<IEnumerable<BookDto>> GetAllBooksAsync()
         {
-            var books = await Context.Books.Take(10).ToListAsync();
+            var books = await Context.Books.Take(20).ToListAsync();
             return Mapper.Map<List<BookDto>>(books);
         }
 
