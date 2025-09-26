@@ -15,12 +15,12 @@ COPY ["MyPersonalLibrary.Server/MyPersonalLibrary.Server.csproj", "MyPersonalLib
 RUN dotnet restore "./MyPersonalLibrary.Server/MyPersonalLibrary.Server.csproj"
 COPY . .
 WORKDIR "/src/MyPersonalLibrary.Server"
-RUN dotnet build "./MyPersonalLibrary.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./MyPersonalLibrary.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:BuildClient=false 
 
 # Questa fase viene usata per pubblicare il progetto di servizio da copiare nella fase finale
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./MyPersonalLibrary.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./MyPersonalLibrary.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BuildClient=false 
 
 # Questa fase viene usata nell'ambiente di produzione o durante l'esecuzione da Visual Studio in modalità normale (impostazione predefinita quando non si usa la configurazione di debug)
 FROM base AS final
