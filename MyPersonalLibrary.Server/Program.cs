@@ -31,7 +31,9 @@ builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
 );
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddAutoMapper(typeof(BookProfile));
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins");
+
+
 
 builder.Services.AddCors(options =>
 {
