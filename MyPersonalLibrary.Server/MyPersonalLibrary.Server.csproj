@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<BuildClient Condition="'$(BuildClient)' == ''">true</BuildClient>
+		<BuildClient Condition="'$(BuildClient)' == ''">false</BuildClient>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -34,7 +34,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(BuildClient)' == 'true'">
 		<ProjectReference Include="..\mypersonallibrary.client\mypersonallibrary.client.esproj">
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 		</ProjectReference>
