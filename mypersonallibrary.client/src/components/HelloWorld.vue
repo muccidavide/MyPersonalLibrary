@@ -31,6 +31,7 @@
 
 <script lang="js">
     import { defineComponent } from 'vue';
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
     export default defineComponent({
         data() {
@@ -39,7 +40,8 @@
                 post: null
             };
         },
-        async created() {
+      async created() {
+        console.log(API_BASE)
             await this.fetchData();
         },
         watch: {
@@ -50,7 +52,7 @@
                 this.post = null;
                 this.loading = true;
 
-                var response = await fetch('api/books');
+                var response = fetch(`${API_BASE}/api/books`);;
                 if (response.ok) {
                     this.post = await response.json();
                     this.loading = false;

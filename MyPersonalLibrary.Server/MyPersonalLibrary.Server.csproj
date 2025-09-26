@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<BuildClient Condition="'$(BuildClient)' == ''">false</BuildClient>
+		<BuildClient Condition="'$(BuildClient)' == ''">true</BuildClient>
 	</PropertyGroup>
 
 	<PropertyGroup>
