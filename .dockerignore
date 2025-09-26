@@ -1,0 +1,14 @@
+# Ignora le cartelle di output standard di .NET
+bin
+obj
+
+# Ignora la cartella del frontend Vue.js
+MyPersonalLibrary.Client
+
+# Ignora le cartelle di Node.js se presenti in sottocartelle
+node_modules
+
+# Ignora i file specifici di Visual Studio o Git
+.vs
+.git
+.gitignore
