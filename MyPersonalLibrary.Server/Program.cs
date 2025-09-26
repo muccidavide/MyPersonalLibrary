@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using MyPersonalLibrary.Server.Endpoints;
 using MyPersonalLibrary.Server.Models.Context;
-using MyPersonalLibrary.Server.Services;
 using MyPersonalLibrary.Server.Profiles;
+using MyPersonalLibrary.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,12 +31,23 @@ builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
 );
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddAutoMapper(typeof(BookProfile));
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueClient", policy =>
+    {
+        policy.WithOrigins(allowedOrigins!)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.MapStaticAssets();
-
+app.UseCors("AllowVueClient");
 // Configure the HTTP request pipeline.
 // http://localhost:5153/swagger/index.html
 if (app.Environment.IsDevelopment())
