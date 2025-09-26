@@ -11,7 +11,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("MyPersonalLibraryDB");
-builder.Services.AddDbContext<MyPersonalLibraryContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
+{
+    options.UseSqlServer(connectionString,
+         sqlServerOptionsAction =>
+         {
+             // Abilita la resilienza (Retry logic) specifica per SQL Server
+             sqlServerOptionsAction.EnableRetryOnFailure(
+                 maxRetryCount: 5,       
+                 maxRetryDelay: TimeSpan.FromSeconds(30), 
+                 errorNumbersToAdd: null 
+             );
+         }
+    );
+
+
+}
+);
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddAutoMapper(typeof(BookProfile));
 
