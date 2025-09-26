@@ -1,5 +1,5 @@
 ﻿# Dentro MyPersonalLibrary.Server/Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copia solo il file .csproj e ripristina (punto 1)
@@ -13,7 +13,7 @@ RUN dotnet publish -c Release -o /app/publish
 # =========================================================================
 
 # Usa l'immagine ufficiale ASP.NET Runtime come base finale (più piccola e sicura)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
 # Copia l'output pubblicato dalla fase di build
