@@ -1,15 +1,17 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import BooksGrid from './components/BooksGrid.vue'
 </script>
 
 <template>
-  <header style="text-align:center">
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <header class="">
+    <nav class="wrapper mb-4 text-center d-flex justify-content-center align-items-center flex-column flex-lg-row">
+          <h1 class="logo extraBold">My Personal Library</h1>
+    </nav>
   </header>
 
   <main>
-    <HelloWorld msg="You did it!" />
+   <!--  <Panel /> -->
+    <BooksGrid msg="You did it!" />
   </main>
 </template>
 
@@ -19,8 +21,7 @@ header {
 }
 
 .logo {
-  display: block;
-  margin: 0 auto 2rem;
+  color:#283618;
 }
 
 @media (min-width: 1024px) {
