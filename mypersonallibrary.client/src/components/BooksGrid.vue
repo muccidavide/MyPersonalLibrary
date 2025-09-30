@@ -1,5 +1,5 @@
 <template>
-  <div class="weather-component">
+  <div class="books-grid-component">
     <div v-if="loading" class="loading">
       Loading... Please refresh.
     </div>
@@ -12,63 +12,84 @@
 
           <div class="ui-card">
             <div class="card-image" :style="{ backgroundImage: `url(${book.imageUrl})` }">
-              <!--  <img :src="book.imageUrl" class="img-fluid w-100 d-block" /> -->
             </div>
-            <!--             <div class="card-title">
-              <p class="montserrat-semibold">{{ book.title }}</p>
-              <p class="montserrat-medium">{{ book.authors }}</p>
-            </div> -->
           </div>
-
 
         </div>
       </div>
 
     </div>
+    <Paginator :rows="pageSize" :totalRecords="totalItems" :rowsPerPageOptions="[6, 12, 24]" @page="onPage"></Paginator>
   </div>
 </template>
 
 <script lang="js">
 import { defineComponent } from 'vue';
+import { Paginator } from 'primevue';
 
-export default defineComponent({
-  data() {
-    return {
-      loading: false,
-      books: null
-    };
-  },
-  async created() {
-    await this.fetchData();
-  },
-  watch: {
-    '$route': 'fetchData'
-  },
-  methods: {
-    async fetchData() {
-      this.books = null;
-      this.loading = true;
+export default defineComponent(
+  {
+    name: 'BooksGrid',
+    components: {
+      Paginator
+    },
+    data() {
+      return {
+        loading: false,
+        books: null,
+        pageSize: 6,
+        totalPages: 0,
+        totalItems: 0,
+        hasNextPage: false,
+        hasPreviousPage: false
+      };
+    },
+    async created() {
+      await this.fetchData();
+    },
+    watch: {
+      '$route': 'fetchData'
+    },
+    methods: {
 
-      try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL;
-        const response = await fetch(`${API_BASE}/api/books`);
-        if (!response.ok) throw new Error('Errore nella risposta');
-        this.books = await response.json();
-        console.log(this.books);
+      async onPage(event) {
+        await this.fetchData(event.page + 1, event.rows);
+      },
+      async fetchData(number = 1, size = 24) {
+        this.books = null;
+        this.loading = true;
+        this.pageSize = size;
 
-      } catch (error) {
-        console.error('Errore nel fetch:', error);
-      } finally {
-        this.loading = false;
+        try {
+          const API_BASE = import.meta.env.VITE_API_BASE_URL;
+          const response = await fetch(`${API_BASE}/api/books?pageNumber=${number}&pageSize=${size}`);
+          if (!response.ok) throw new Error('Errore nella risposta');
+          
+          let data = await response.json();
+          this.books = data.items;
+          this.totalPages = data.totalPages
+          this.totalItems = data.totalItems
+          this.hasNextPage = data.hasNextPage
+          this.hasPreviousPage = data.hasPreviousPage
+
+          console.log(this.books);
+
+        } catch (error) {
+          console.error('Errore nel fetch:', error);
+        } finally {
+          this.loading = false;
+        }
       }
-    }
-  },
-});
+    },
+  });
 </script>
 
 <style scoped>
+.card-container{
+  min-height: 80vh;
+}
 .mpl-card {
-  
+
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px;
