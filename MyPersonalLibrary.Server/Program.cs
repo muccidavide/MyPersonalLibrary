@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyPersonalLibrary.Server.Endpoints;
 using MyPersonalLibrary.Server.Models.Context;
 using MyPersonalLibrary.Server.Profiles;
+using MyPersonalLibrary.Server.Repositories;
 using MyPersonalLibrary.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
 }
 );
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();  
 builder.Services.AddAutoMapper(typeof(BookProfile));
 var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins");
 
