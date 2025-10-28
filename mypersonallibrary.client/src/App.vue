@@ -33,26 +33,30 @@ const handlePageChange = (newPage, pageSize) => {
   fetchBooks()
 }
 
+let fetchTimeout = null
+
 const fetchBooks = async () => {
-  console.log('Fetching books with:', {
-    page: page.value,
-    pageSize: pageSize.value,
-    searchTerm: searchTerm.value,
-    filters: filters.value
-  })  
-  const API_BASE = import.meta.env.VITE_API_BASE_URL
-  const response = await fetch(`${API_BASE}/api/books?pageNumber=${encodeURIComponent(page.value)}&pageSize=${encodeURIComponent(pageSize.value)}&title=${encodeURIComponent(searchTerm.value)}&author=${encodeURIComponent(filters.value.author)}&year=${encodeURIComponent(filters.value.year)}`)
+  clearTimeout(fetchTimeout)
+  fetchTimeout = setTimeout(async () => {
+    console.log('Fetching books with:', {
+      page: page.value,
+      pageSize: pageSize.value,
+      searchTerm: searchTerm.value,
+      filters: filters.value
+    })
 
-  const data = await response.json( )
-  allBooks.value = data.items
-  totalItems.value = data.totalItems
-  totalPages.value = data.totalPages
-  hasNextPage.value = data.hasNextPage
-  hasPreviousPage.value = data.hasPreviousPage
+    const API_BASE = import.meta.env.VITE_API_BASE_URL
+    const response = await fetch(`${API_BASE}/api/books?pageNumber=${encodeURIComponent(page.value)}&pageSize=${encodeURIComponent(pageSize.value)}&title=${encodeURIComponent(searchTerm.value)}&author=${encodeURIComponent(filters.value.author)}&year=${encodeURIComponent(filters.value.year)}`)
 
+    const data = await response.json()
+    allBooks.value = data.items
+    totalItems.value = data.totalItems
+    totalPages.value = data.totalPages
+    hasNextPage.value = data.hasNextPage
+    hasPreviousPage.value = data.hasPreviousPage
 
-  
-  console.log('Fetched books data:', allBooks.value)
+    console.log('Fetched books data:', allBooks.value)
+  }, 300)
 }
 
 
