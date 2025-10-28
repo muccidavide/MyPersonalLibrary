@@ -21,16 +21,16 @@ namespace MyPersonalLibrary.Server.Services
             return books is null ? new List<BookDto>() : Mapper.Map<IList<BookDto>>(books);
         }
 
-        public async Task<PaginatedResult<BookDto>> GetPaginatedBooksAsync(int pageNumber = 1, int pageSize = 24)
+        public async Task<PaginatedResult<BookDto>> GetPaginatedBooksAsync(int pageNumber = 1, int pageSize = 24, string? title = null, string? author = null, string? year = null)
         {
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 24;
 
-            var totalItems = await Repository.GetTotalAsync();
-            var books = await Repository.GetPaginatedAsync(pageNumber, pageSize);
+            var totalItems = await Repository.GetTotalAsync(title, author, year);
+            var books = await Repository.GetPaginatedAsync(pageNumber, pageSize, title, author, year);
             var bookDtos = Mapper.Map<List<BookDto>>(books);
 
-            return PaginatedResult<BookDto>.Create(bookDtos, totalItems, pageNumber, pageSize);
+            return PaginatedResult<BookDto>.Paginate(bookDtos, totalItems, pageNumber, pageSize);
         }
 
 

@@ -19,7 +19,7 @@
             TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
         }
 
-        public static PaginatedResult<T> Create(List<T> items, int totalItems, int pageNumber, int pageSize)
+        public static PaginatedResult<T> Paginate(List<T> items, int totalItems, int pageNumber, int pageSize)
         {
             if (pageNumber < 1) throw new ArgumentOutOfRangeException(nameof(pageNumber));
             if (pageSize < 1) throw new ArgumentOutOfRangeException(nameof(pageSize));

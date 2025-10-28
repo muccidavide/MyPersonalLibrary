@@ -12,8 +12,8 @@ namespace MyPersonalLibrary.Server.Endpoints
             var booksGroup = app.MapGroup("/api/books")
                                 .WithTags("Books API");
 
-            booksGroup.MapGet("/", async (int pageNumber, int pageSize, string title, string author, string year , IBookService service) =>
-                await service.GetPaginatedBooksAsync(pageNumber, pageSize)
+            booksGroup.MapGet("/", async (int pageNumber, int pageSize, string? title, string? author, string? year , IBookService service) =>
+                await service.GetPaginatedBooksAsync(pageNumber, pageSize, title, author, year)
                     is PaginatedResult<BookDto> book
                     ? Results.Ok(book)
                     : Results.NotFound());
