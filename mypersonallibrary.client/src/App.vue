@@ -1,5 +1,6 @@
 <script setup>
 import BooksGrid from './components/BooksGrid.vue'
+import { Button } from "@/components/ui/button"
 </script>
 
 <template>
@@ -10,7 +11,6 @@ import BooksGrid from './components/BooksGrid.vue'
   </header>
 
   <main>
-    <!--  <Panel /> -->
     <BooksGrid msg="You did it!" />
   </main>
 </template>

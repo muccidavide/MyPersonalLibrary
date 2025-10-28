@@ -9,29 +9,25 @@
       <div class="row">
         <div v-for="book in books" :key="book.id"
           class="col-12 col-lg-4  col-xl-2 text-center my-3 justify-content-center d-flex">
-
           <div class="ui-card">
             <div class="card-image" :style="{ backgroundImage: `url(${book.imageUrl})` }">
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
+    
     <Paginator :rows="pageSize" :totalRecords="totalItems" :rowsPerPageOptions="[6, 12, 24]" @page="onPage"></Paginator>
   </div>
 </template>
 
 <script lang="js">
 import { defineComponent } from 'vue';
-import { Paginator } from 'primevue';
 
 export default defineComponent(
   {
     name: 'BooksGrid',
     components: {
-      Paginator
     },
     data() {
       return {
@@ -55,6 +51,7 @@ export default defineComponent(
       async onPage(event) {
         await this.fetchData(event.page + 1, event.rows);
       },
+
       async fetchData(number = 1, size = 24) {
         this.books = null;
         this.loading = true;
@@ -66,13 +63,12 @@ export default defineComponent(
           if (!response.ok) throw new Error('Errore nella risposta');
           
           let data = await response.json();
+          
           this.books = data.items;
-          this.totalPages = data.totalPages
-          this.totalItems = data.totalItems
-          this.hasNextPage = data.hasNextPage
-          this.hasPreviousPage = data.hasPreviousPage
-
-          console.log(this.books);
+          this.totalPages = data.totalPages;
+          this.totalItems = data.totalItems;
+          this.hasNextPage = data.hasNextPage;
+          this.hasPreviousPage = data.hasPreviousPage;
 
         } catch (error) {
           console.error('Errore nel fetch:', error);
@@ -140,6 +136,5 @@ export default defineComponent(
   .mpl-card img {
     min-width: 80vw;
   }
-
 }
 </style>
