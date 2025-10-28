@@ -78,6 +78,5 @@ namespace MyPersonalLibrary.Server.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
     }
 }

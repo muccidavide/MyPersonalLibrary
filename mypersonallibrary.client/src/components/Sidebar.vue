@@ -1,16 +1,10 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-content">
+      
       <div class="sidebar-header">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
@@ -19,23 +13,10 @@
 
       <div class="search-section">
         <div class="search-input-wrapper">
-          <input
-            type="text"
-            v-model="searchQuery"
-            @input="onSearchChange"
-            placeholder="Cerca libri..."
-            class="search-input"
-          />
-          <svg 
-            class="search-icon"
-            xmlns="http://www.w3.org/2000/svg" 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2"
-          >
+          <input type="text" v-model="searchQuery" @input="onSearchChange" placeholder="Cerca libri..."
+            class="search-input" />
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
@@ -44,43 +25,22 @@
 
       <div class="filters-section">
         <h3>Filtri</h3>
-        
+
         <div class="filter-group">
           <label for="author-filter">Autore</label>
-          <input
-            id="author-filter"
-            type="text"
-            v-model="authorFilter"
-            @input="onFilterChange"
-            placeholder="Nome autore"
-            class="filter-input"
-          />
+          <input id="author-filter" type="text" v-model="authorFilter" @input="onFilterChange" placeholder="Nome autore"
+            class="filter-input" />
         </div>
 
         <div class="filter-group">
           <label for="year-filter">Anno di pubblicazione</label>
-          <input
-            id="year-filter"
-            type="number"
-            v-model="yearFilter"
-            @input="onFilterChange"
-            placeholder="Anno"
-            class="filter-input"
-            min="1000"
-            max="2100"
-          />
+          <input id="year-filter" type="number" v-model="yearFilter" @input="onFilterChange" placeholder="Anno"
+            class="filter-input" min="1000" max="2100" />
         </div>
 
         <button @click="clearFilters" class="clear-button">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="16" 
-            height="16" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            stroke-width="2"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
             <path d="M18 6 6 18"></path>
             <path d="m6 6 12 12"></path>
           </svg>
