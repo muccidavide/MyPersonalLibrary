@@ -3,9 +3,7 @@
     <div v-if="loading" class="loading">
       Loading... Please refresh.
     </div>
-
-
-    <div class="card-container">
+     <div class="card-container">
       <div class="row">
         <div v-for="book in books" :key="book.id"
           class="col-12 col-lg-4  col-xl-2 text-center my-3 justify-content-center d-flex">
@@ -15,24 +13,49 @@
           </div>
         </div>
       </div>
-    </div>
-    
-    <Paginator :rows="pageSize" :totalRecords="totalItems" :rowsPerPageOptions="[6, 12, 24]" @page="onPage"></Paginator>
+    </div> 
+    <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="pageSize" :total="totalItems" :default-page="1">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious />
+        <template v-for="(item, index) in items" :key="index">
+          <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+            {{ item.value }}
+          </PaginationItem>
+        </template>
+        <PaginationEllipsis :index="4" />
+        <PaginationNext />
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>
 
 <script lang="js">
 import { defineComponent } from 'vue';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 
 export default defineComponent(
   {
     name: 'BooksGrid',
     components: {
+      Pagination,
+      PaginationContent,
+      PaginationEllipsis,
+      PaginationItem,
+      PaginationNext,
+      PaginationPrevious
     },
     data() {
       return {
         loading: false,
-        books: null,
+        books: [],
+        page: 1,
         pageSize: 6,
         totalPages: 0,
         totalItems: 0,
@@ -48,11 +71,12 @@ export default defineComponent(
     },
     methods: {
 
-      async onPage(event) {
-        await this.fetchData(event.page + 1, event.rows);
+      async handlePageChange(pageNumber) {
+        console.log('Page changed to:', pageNumber);
+        await this.fetchData(pageNumber);
       },
 
-      async fetchData(number = 1, size = 24) {
+      async fetchData(number = 1, size = 12) {
         this.books = null;
         this.loading = true;
         this.pageSize = size;
@@ -61,14 +85,16 @@ export default defineComponent(
           const API_BASE = import.meta.env.VITE_API_BASE_URL;
           const response = await fetch(`${API_BASE}/api/books?pageNumber=${number}&pageSize=${size}`);
           if (!response.ok) throw new Error('Errore nella risposta');
-          
+
           let data = await response.json();
-          
+
           this.books = data.items;
           this.totalPages = data.totalPages;
           this.totalItems = data.totalItems;
           this.hasNextPage = data.hasNextPage;
           this.hasPreviousPage = data.hasPreviousPage;
+
+          console.log('Books fetched:', this.books);
 
         } catch (error) {
           console.error('Errore nel fetch:', error);
@@ -81,9 +107,10 @@ export default defineComponent(
 </script>
 
 <style scoped>
-.card-container{
+.card-container {
   min-height: 80vh;
 }
+
 .mpl-card {
 
   border: 1px solid #ccc;

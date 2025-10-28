@@ -1,51 +1,48 @@
 <script setup>
-import BooksGrid from './components/BooksGrid.vue'
-import { Button } from "@/components/ui/button"
+import BooksGrid from './components/BooksGrid.vue';
+import Navbar from './components/Navbar.vue';
+import Sidebar from './components/Sidebar.vue';
 </script>
 
 <template>
-  <header class="">
-    <nav class="wrapper mb-4 text-center d-flex justify-content-center align-items-center flex-column flex-lg-row">
-      <h1 class="logo extraBold">My Personal Library</h1>
-    </nav>
-  </header>
-
-  <main>
-    <BooksGrid msg="You did it!" />
-  </main>
+  <div class="app-container">
+    <Navbar />
+    <div class="content-wrapper">
+      <Sidebar />
+      <main class="main-content">
+        <BooksGrid msg="You did it!" />
+      </main>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.logo {
-  color: #283618;
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    justify-content: center;
-  }
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
   }
-
-  nav {
-    background-color: var(--color-background-soft);
-    width: 100%;
-    min-height: 100px;
-    margin: 0;
-    padding: 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+  
+  .main-content {
+    padding: 1rem;
   }
 }
 </style>
