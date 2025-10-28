@@ -11,6 +11,7 @@ namespace MyPersonalLibrary.Server.Repositories
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
         public async Task<Book> AddAsync(Book book)
         {
             ArgumentNullException.ThrowIfNull(book);
@@ -32,11 +33,8 @@ namespace MyPersonalLibrary.Server.Repositories
                 .AsNoTracking()
                 .ToListAsync();
 
-        public Task<Book?> GetByIdAsync(int id)
-            => Context.Books
-                .Where(x => x.Id.Equals(id))
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+        public async Task<Book?> GetByIdAsync(int id)
+            => await Context.Books.FindAsync(id);
 
         public async Task<bool> UpdateAsync(Book book)
         {
@@ -46,8 +44,7 @@ namespace MyPersonalLibrary.Server.Repositories
         }
 
         public async Task<int> GetTotalAsync()
-            => await Context.Books
-                .AsNoTracking().CountAsync();
+            => await Context.Books.CountAsync();
 
         public async Task<IEnumerable<Book>> GetPaginatedAsync(int pageNumber = 1, int pageSize = 24)
             => await Context.Books
