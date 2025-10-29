@@ -5,10 +5,12 @@ namespace MyPersonalLibrary.Server.Exceptions
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
-        IProblemDetailsService ProblemDetailsService;
-        public GlobalExceptionHandler(IProblemDetailsService problemDetailsService)
+        private readonly IProblemDetailsService ProblemDetailsService;
+        private readonly ILogger<GlobalExceptionHandler> Logger;
+        public GlobalExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<GlobalExceptionHandler> logger)
         {
             ProblemDetailsService = problemDetailsService ?? throw new ArgumentNullException(nameof(problemDetailsService));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
@@ -18,6 +20,8 @@ namespace MyPersonalLibrary.Server.Exceptions
                 ApplicationException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
+
+            Logger.LogError(exception, "An error occurred: {Message}", exception.Message);
 
             return await ProblemDetailsService.TryWriteAsync(new ProblemDetailsContext
             {
