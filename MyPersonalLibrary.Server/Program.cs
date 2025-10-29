@@ -5,6 +5,7 @@ using MyPersonalLibrary.Server.Models.Context;
 using MyPersonalLibrary.Server.Profiles;
 using MyPersonalLibrary.Server.Repositories;
 using MyPersonalLibrary.Server.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MyPersonalLibraryDB");
 var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins");
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 builder.Services.AddProblemDetails();    
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
