@@ -1,107 +1,104 @@
-# 📚 MyPersonalLibrary - Full-Stack Library Catalog
+# 📚 MyPersonalLibrary - Catalogo Full-Stack di Libri
 
-## Project Overview
+## Panoramica del Progetto
 
-**MyPersonalLibrary** is a full-stack demonstration application designed to catalog and manage a personal book collection. This project was developed as a practical exercise to showcase the effecti[...]  
+**MyPersonalLibrary** è un'applicazione full-stack di esempio progettata per catalogare e gestire una collezione personale di libri. Questo progetto è stato realizzato come esercizio pratico per mostrare le competenze nello sviluppo end-to-end.
 
-The application allows users to quickly search for books within their catalog and perform comprehensive **CRUD** (Create, Read, Update, Delete) operations for managing book entries.
+L'applicazione permette agli utenti di cercare rapidamente libri nel proprio catalogo e di eseguire operazioni **CRUD** (Create, Read, Update, Delete) complete per la gestione delle schede dei libri.
 
 -----
 
-## Technology Stack
+## Stack Tecnologico
 
-The project leverages a modern and industry-standard technology stack:
+Il progetto utilizza uno stack moderno e diffuso in ambito industriale:
 
-| Component | Technology | Description |
+| Componente | Tecnologia | Descrizione |
 | :--- | :--- | :--- |
-| **Database** | **SQL Server** | Stores catalog data (titles, authors, publication years, ISBNs, etc.). |
-| **Backend / API** | **.NET (C#)** | Implements a RESTful API to handle business logic and database interactions. |
-| **Frontend** | **Vue.js** | Provides a dynamic and reactive user interface (UI) for catalog display and CRUD form management. |
+| **Database** | **SQL Server** | Memorizza i dati del catalogo (titoli, autori, anni di pubblicazione, ISBN, ecc.). |
+| **Backend / API** | **.NET (C#)** | Implementa un'API RESTful per gestire la logica di business e le interazioni con il database. |
+| **Frontend** | **Vue.js** | Fornisce un'interfaccia utente dinamica e reattiva per la visualizzazione del catalogo e la gestione dei form CRUD. |
 
 -----
 
-## Key Features
+## Funzionalità Principali
 
-### 🔍 End-User Functionality
+### 🔍 Funzionalità per l'Utente
 
-  * **Advanced Search (con lazy loading):** Filter the catalog by title, author, publication year, or ISBN. Implementata la ricerca avanzata con lazy loading per caricare i risultati on-demand e migliorare le performance lato client e server.
-  * **Catalog Browsing:** Intuitive and paginated navigation through the entire library.
-  * **Book Details:** View comprehensive metadata for each book entry.
+  * **Ricerca Avanzata (con lazy loading):** Filtra il catalogo per titolo, autore, anno di pubblicazione o ISBN. La ricerca avanzata è implementata con lazy loading per caricare i risultati on-demand e migliorare le prestazioni lato client e server.
+  * **Navigazione Catalogo:** Navigazione intuitiva e paginata attraverso l'intera libreria.
+  * **Dettagli Libro:** Visualizza i metadati completi per ogni voce di libro.
 
-  ### 🧰 Implementazioni recenti
+  * **Gestione Globale delle Eccezioni:** L'app dispone di una gestione centralizzata delle eccezioni sia a livello di API che nel frontend per migliorare l'affidabilità e l'esperienza utente.
+  * **Logging Centralizzato:** I log dell'applicazione vengono persistiti sia su database che su file per facilitare il monitoraggio e il troubleshooting.
 
-  * È stata aggiunta la ricerca avanzata con lazy loading (caricamento on-demand dei risultati) per migliorare le performance e l'esperienza utente.
-  * Gestione globale delle eccezioni implementata a livello di API e frontend.
-  * Logging centralizzato: i log vengono persistiti sia su database che su file per facilitare il monitoraggio e il troubleshooting.
+### ⚙️ Funzionalità di Amministrazione (CRUD)
 
-### ⚙️ Management Functionality (CRUD)
-
-  * **C - Create:** Add new books to the database via a dedicated form.
-  * **R - Read:** Retrieve and display all books or a single record.
-  * **U - Update:** Modify the details of an existing book.
-  * **D - Delete:** Permanently remove a book from the catalog.
+  * **C - Create:** Aggiungi nuovi libri al database tramite un form dedicato.
+  * **R - Read:** Recupera e visualizza tutti i libri o una singola voce.
+  * **U - Update:** Modifica i dettagli di un libro esistente.
+  * **D - Delete:** Rimuovi definitivamente un libro dal catalogo.
 
 -----
 
-## Architecture and Design
+## Architettura e Design
 
-The project employs a three-tier architecture:
+Il progetto segue un'architettura a tre livelli:
 
-1.  **Data Layer (SQL Server):** Optimized table structure for efficient searching.
-2.  **Logic/API Layer (.NET):** The API uses a **Repository Pattern** or **Service Layer** approach to separate business logic from data access, ensuring clean and testable code.
-3.  **Presentation Layer (Vue.js):** The frontend communicates with the API via HTTP/Axios calls, operating as a **Single Page Application (SPA)** for a smooth user experience.
+1.  **Data Layer (SQL Server):** Struttura di tabelle ottimizzata per ricerche efficienti.
+2.  **Logic/API Layer (.NET):** L'API utilizza il **Repository Pattern** o un **Service Layer** per separare la logica di business dall'accesso ai dati, garantendo codice pulito e testabile.
+3.  **Presentation Layer (Vue.js):** Il frontend comunica con l'API tramite chiamate HTTP/Axios, operando come **Single Page Application (SPA)** per un'esperienza fluida.
 
 -----
 
-## Local Setup and Running Instructions
+## Configurazione Locale e Avvio
 
-### Prerequisites
+### Prerequisiti
 
-  * [.NET SDK (Latest Stable Version)]
-  * [Node.js / npm (Latest Stable Version)]
-  * [SQL Server or equivalent local database setup]
+  * [.NET SDK (ultima versione stabile)]
+  * [Node.js / npm (ultima versione stabile)]
+  * [SQL Server o equivalente per ambiente locale]
 
-### 1. Database Setup
+### 1. Configurazione Database
 
-1.  Ensure your SQL server instance is running.
-2.  Navigate to the `SQL/` directory and execute the **`01_Schema.sql`** script to create the necessary tables (e.g., `[dbo].[book]`).
-3.  *Optional:* Execute the **`02_SeedData.sql`** script to populate the database with initial sample entries.
+1.  Assicurati che l'istanza di SQL Server sia in esecuzione.
+2.  Naviga nella cartella `SQL/` ed esegui lo script **`01_Schema.sql`** per creare le tabelle necessarie (es. `[dbo].[book]`).
+3.  *Opzionale:* Esegui lo script **`02_SeedData.sql`** per popolare il database con voci di esempio.
 
-### 2. Starting the Backend (.NET API)
+### 2. Avvio del Backend (.NET API)
 
-1.  Update the connection string (`DefaultConnection`) in the **`MyPersonalLibrary.Api/appsettings.json`** file to match your local SQL connection details.
-2.  Navigate to the API project directory and run the application:
+1.  Aggiorna la stringa di connessione (`DefaultConnection`) nel file **`MyPersonalLibrary.Api/appsettings.json`** con i dettagli della tua connessione SQL locale.
+2.  Spostati nella directory del progetto API e avvia l'applicazione:
 
 ```bash
-# Navigate to the API project directory
+# Vai nella directory del progetto API
 cd MyPersonalLibrary.Api
 dotnet restore
 dotnet run
 ```
 
-*The API will be running on [http://localhost:XXXX].*
+*L'API sarà disponibile su [http://localhost:XXXX].*
 
-### 3. Starting the Frontend (Vue.js)
+### 3. Avvio del Frontend (Vue.js)
 
-1.  Navigate to the Frontend project directory:
-2.  Install dependencies and start the development server:
+1.  Spostati nella directory del progetto frontend:
+2.  Installa le dipendenze e avvia il server di sviluppo:
 
 ```bash
-# Navigate to the Frontend project directory
+# Vai nella directory del progetto Frontend
 cd MyPersonalLibrary.Frontend
 npm install
 npm run serve
 ```
 
-*The user interface will be available on [http://localhost:8080].*
+*L'interfaccia utente sarà disponibile su [http://localhost:8080].*
 
 -----
 
-## Portfolio Objectives
+## Obiettivi del Portfolio
 
-This project was developed to demonstrate the following technical skills:
+Questo progetto è stato sviluppato per dimostrare le seguenti competenze tecniche:
 
-  * **Full-Stack Proficiency:** Managing the entire application lifecycle from database design to frontend deployment.
-  * **RESTful API Design:** Implementing clean and efficient data access endpoints using .NET.
-  * **Frontend State Management:** Building a reactive UI with Vue.js, demonstrating efficient component design and data flow.
-  * **Data Integration:** Practical application of database connectivity and manipulation (e.g., via Entity Framework Core).
+  * **Competenze Full-Stack:** Gestione dell'intero ciclo di vita dell'applicazione, dalla progettazione del database al deployment del frontend.
+  * **Design di API RESTful:** Implementazione di endpoint chiari ed efficienti con .NET.
+  * **Gestione dello Stato nel Frontend:** Costruzione di un'interfaccia reattiva con Vue.js, dimostrando un design efficiente dei componenti e del flusso dei dati.
+  * **Integrazione Dati:** Applicazione pratica della connettività e manipolazione del database (es. tramite Entity Framework Core).
