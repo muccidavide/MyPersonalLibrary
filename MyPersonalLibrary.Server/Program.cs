@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using MyPersonalLibrary.Server.Endpoints;
+using MyPersonalLibrary.Server.Exceptions;
 using MyPersonalLibrary.Server.Models.Context;
 using MyPersonalLibrary.Server.Profiles;
 using MyPersonalLibrary.Server.Repositories;
@@ -8,11 +8,12 @@ using MyPersonalLibrary.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("MyPersonalLibraryDB");
+var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins");
+
+builder.Services.AddProblemDetails();    
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
 {
     options.UseSqlServer(connectionString,
@@ -20,23 +21,17 @@ builder.Services.AddDbContext<MyPersonalLibraryContext>(options =>
          {
              // Abilita la resilienza (Retry logic) specifica per SQL Server
              sqlServerOptionsAction.EnableRetryOnFailure(
-                 maxRetryCount: 5,       
-                 maxRetryDelay: TimeSpan.FromSeconds(30), 
-                 errorNumbersToAdd: null 
+                 maxRetryCount: 5,
+                 maxRetryDelay: TimeSpan.FromSeconds(30),
+                 errorNumbersToAdd: null
              );
          }
     );
-
-
-}
-);
+});
+builder.Services.AddOpenApi();
 builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();  
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddAutoMapper(typeof(BookProfile));
-var allowedOrigins = builder.Configuration.GetValue<string>("AllowedOrigins");
-
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueClient", policy =>
@@ -52,8 +47,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.MapStaticAssets();
 app.UseCors("AllowVueClient");
-// Configure the HTTP request pipeline.
-// http://localhost:5153/swagger/index.html
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -64,4 +58,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapBookEndpoints();
+app.UseExceptionHandler();
 app.Run();
