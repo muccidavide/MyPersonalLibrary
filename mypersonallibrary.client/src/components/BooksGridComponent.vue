@@ -18,8 +18,8 @@
       :default-page="1">
       <PaginationContent v-slot="{ items }">
         <PaginationPrevious />
-        <template v-for="(item, index) in items" :key="index">
-          <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+        <template v-for="(item, index) in items">
+          <PaginationItem :key="index" v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
             {{ item.value }}
           </PaginationItem>
         </template>
@@ -59,7 +59,8 @@ export default defineComponent(
       },
       books: {
         type: Array,
-        required: true
+        required: true,
+        default: () => [] 
       },
       totalItems: {
         type: Number,
@@ -88,14 +89,19 @@ export default defineComponent(
     async created() {
     },
     watch: {
-      '$route': 'fetchData'
+      books(newBooks) {
+        try {
+          console.log('BooksGridComponent received books:', Array.isArray(newBooks) ? newBooks.length : typeof newBooks);
+          if (Array.isArray(newBooks) && newBooks.length > 0) {
+            console.log('First book keys:', Object.keys(newBooks[0] || {}));
+          }
+        } catch { /* noop */ }
+      }
     },
     methods: {
-
       async handlePageChange(pageNumber) {
         this.$emit('page-change', pageNumber, this.pageSize);
       },
-
     },
   });
 </script>
