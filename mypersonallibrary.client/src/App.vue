@@ -1,79 +1,44 @@
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import Sidebar from './components/Sidebar.vue'
-import BooksGrid from './components/BooksGrid.vue'
-import Navbar from './components/Navbar.vue';
+﻿<template>
 
-
-const searchTerm = ref('')
-const filters = ref({ author: '', year: '' })
-const page = ref(1)
-const pageSize = ref(12)
-const allBooks = ref([])
-const totalItems = ref(0)
-const totalPages = ref(0)
-const hasNextPage = ref(false)
-const hasPreviousPage = ref(false)  
-
-const handleSearch = (query) => {
-  searchTerm.value = query
-  fetchBooks()
-}
-
-const handleFilterChange = (newFilters) => {
-  filters.value = newFilters
-  fetchBooks()
-}
-
-const handlePageChange = (newPage, pageSize) => {
-  // TODO: Update page and pageSize refs and fetch books for the new page
-  page.value = newPage
-  pageSize = pageSize
-  console.log('Page changed to:', newPage, 'with page size:', pageSize)
-  fetchBooks()
-}
-
-let fetchTimeout = null
-
-const fetchBooks = async () => {
-  clearTimeout(fetchTimeout)
-  fetchTimeout = setTimeout(async () => {
-    console.log('Fetching books with:', {
-      page: page.value,
-      pageSize: pageSize.value,
-      searchTerm: searchTerm.value,
-      filters: filters.value
-    })
-
-    const API_BASE = import.meta.env.VITE_API_BASE_URL
-    const response = await fetch(`${API_BASE}/api/books?pageNumber=${encodeURIComponent(page.value)}&pageSize=${encodeURIComponent(pageSize.value)}&title=${encodeURIComponent(searchTerm.value)}&author=${encodeURIComponent(filters.value.author)}&year=${encodeURIComponent(filters.value.year)}`)
-
-    const data = await response.json()
-    allBooks.value = data.items
-    totalItems.value = data.totalItems
-    totalPages.value = data.totalPages
-    hasNextPage.value = data.hasNextPage
-    hasPreviousPage.value = data.hasPreviousPage
-
-    console.log('Fetched books data:', allBooks.value)
-  }, 300)
-}
-
-
-onMounted(fetchBooks)
-</script>
-
-<template>
   <div class="app-container">
-    <Navbar />
+    <Navbar @open-login="showLogin = true" />
     <div class="content-wrapper">
-      <Sidebar  @search="handleSearch" @filter-change="handleFilterChange"/>
-      <main class="main-content">
-      <BooksGrid :books="allBooks" :totalItems="totalItems" :page="page" :totalPages="totalPages" :hasNextPage="hasNextPage" :hasPreviousPage="hasPreviousPage"  @page-change="handlePageChange" />
-      </main>
+      <RouterView />
     </div>
-  </div>
+  <teleport to="body">
+    <transition name="fade">
+      <div v-if="showLogin" class="modal-overlay" @click.self="close" role="dialog" aria-modal="true">
+        <div class="modal-card">
+          <button class="modal-close" @click="close" aria-label="Chiudi">✕</button>
+          <Login @login="handleLogin" />
+        </div>
+      </div>
+    </transition>
+  </teleport>
+</div>
 </template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import Navbar from './components/NavBarComponent.vue'
+import Login from './components/LoginComponent.vue'
+import { RouterView } from 'vue-router'
+
+const showLogin = ref(false)
+
+const close = () => (showLogin.value = false)
+
+const handleLogin = async (credentials) => {
+  // integra qui la chiamata API di autenticazione
+  console.log('Login richiesto', credentials)
+  showLogin.value = false
+}
+
+const onKey = (e) => e.key === 'Escape' && close()
+
+onMounted(() => window.addEventListener('keydown', onKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+</script>
 
 <style scoped>
 .app-container {
@@ -89,19 +54,57 @@ onMounted(fetchBooks)
   overflow: hidden;
 }
 
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.6);
+  z-index: 9999;
+  padding: 1.25rem;
 }
 
-@media (max-width: 768px) {
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 1rem;
+  position: relative;
+  border: 4px solid rgba(188, 108, 37, 0.12);
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 1.05rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .18s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width:768px) {
   .content-wrapper {
     flex-direction: column;
   }
-  
-  .main-content {
-    padding: 1rem;
+
+  .modal-card {
+    max-width: 100%;
+    margin: 0 .5rem;
   }
 }
 </style>
