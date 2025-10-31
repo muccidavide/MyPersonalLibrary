@@ -34,12 +34,22 @@ namespace MyPersonalLibrary.Server.Repositories
                 .ToListAsync();
 
         public async Task<Book?> GetByIdAsync(int id)
-            => await Context.Books.FindAsync(id);
+            => await Context.Books
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == id);
 
         public async Task<bool> UpdateAsync(Book book)
         {
             ArgumentNullException.ThrowIfNull(book);
-            Context.Books.Update(book);
+            // Ensure no duplicate tracked entity with same key
+            var local = Context.Books.Local.FirstOrDefault(e => e.Id == book.Id);
+            if (local is not null)
+            {
+                Context.Entry(local).State = EntityState.Detached;
+            }
+
+            Context.Attach(book);
+            Context.Entry(book).State = EntityState.Modified;
             return await Context.SaveChangesAsync() > 0;
         }
 

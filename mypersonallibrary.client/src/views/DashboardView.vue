@@ -11,7 +11,6 @@
                         <TableHead>Titolo</TableHead>
                         <TableHead>Autore</TableHead>
                         <TableHead>Anno</TableHead>
-                        <TableHead class="text-right">Prezzo</TableHead>
                         <TableHead >Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -20,9 +19,8 @@
                         <TableCell>{{ book.title }}</TableCell>
                         <TableCell>{{ book.authors }}</TableCell>
                         <TableCell>{{ book.originalPublicationYear }}</TableCell>
-                        <TableCell class="text-right">{{ book.price }}</TableCell>
                         <TableCell>
-                            <button @click="editBook(book)" class="btn btn-sm btn-primary me-2">Edit</button>
+                            <button @click="openEdit(book)" class="btn btn-sm btn-primary me-2">Edit</button>
                             <button @click="deleteBook(book.id)" class="btn btn-sm btn-danger">Delete</button>
                         </TableCell>
                     </TableRow>
@@ -44,12 +42,30 @@
                 </PaginationContent>
             </Pagination>
         </main>
+
+        <teleport to="body">
+            <transition name="fade">
+                <div v-if="showEditModal" class="modal-overlay" @click.self="closeEdit" role="dialog" aria-modal="true">
+                    <div class="modal-card">
+                        <BookCardComponent v-if="selectedBook" :book="selectedBook" @save="saveEditedBook" @cancel="closeEdit" />
+                    </div>
+                </div>
+            </transition>
+        </teleport>
+        <ConfirmModalComponent
+            :open="showConfirmModal"
+            :message="confirmMessage"
+            @confirm="handleConfirm"
+            @cancel="handleCancel"
+        />
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Sidebar from '@/components/SidebarComponent.vue'
+import BookCardComponent from '@/components/BookCardComponent.vue'
+import ConfirmModalComponent from '@/components/ConfirmModalComponent.vue'
 import {
     Table,
     TableBody,
@@ -78,6 +94,11 @@ const totalPages = ref(0)
 const hasNextPage = ref(false)
 const hasPreviousPage = ref(false)
 const loading = ref(false)
+const showEditModal = ref(false)
+const selectedBook = ref(null)
+const showConfirmModal = ref(false)
+const confirmMessage = ref('')
+const confirmAction = ref(null)
 
 let fetchTimeout = null
 let currentAbort = null
@@ -87,9 +108,13 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL
 const editBook = async (book) => {
     try {
         const res = await fetch(`${API_BASE}/api/books/${book.id}`, {
-            method: 'POST',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(book) // oppure solo i campi modificati
+            body: JSON.stringify({
+                title: book.title,
+                authors: book.authors,
+                originalPublicationYear: book.originalPublicationYear
+            })
         })
         if (!res.ok) throw new Error('Errore durante la modifica')
         console.log(`Libro ${book.id} modificato con successo`)
@@ -99,7 +124,24 @@ const editBook = async (book) => {
     }
 }
 
-const deleteBook = async (bookId) => {
+const openEdit = (book) => {
+    selectedBook.value = { ...book }
+    showEditModal.value = true
+}
+
+const closeEdit = () => {
+    showEditModal.value = false
+    selectedBook.value = null
+}
+
+const saveEditedBook = async (updated) => {
+    requestConfirm('Confermi il salvataggio delle modifiche?', async () => {
+        await editBook(updated)
+        closeEdit()
+    })
+}
+
+const performDelete = async (bookId) => {
     try {
         const res = await fetch(`${API_BASE}/api/books/${bookId}`, {
             method: 'DELETE'
@@ -110,6 +152,37 @@ const deleteBook = async (bookId) => {
     } catch (err) {
         console.error('Errore deleteBook:', err)
     }
+}
+
+const deleteBook = (bookId) => {
+    requestConfirm('Sei sicuro di voler eliminare questo libro?', async () => {
+        await performDelete(bookId)
+    })
+}
+
+const requestConfirm = (message, action) => {
+    confirmMessage.value = message
+    confirmAction.value = action
+    showConfirmModal.value = true
+}
+
+const handleConfirm = async () => {
+    try {
+        const action = confirmAction.value
+        showConfirmModal.value = false
+        confirmAction.value = null
+        if (typeof action === 'function') {
+            await action()
+        }
+    } finally {
+        confirmMessage.value = ''
+    }
+}
+
+const handleCancel = () => {
+    showConfirmModal.value = false
+    confirmMessage.value = ''
+    confirmAction.value = null
 }
 
 const fetchBooks = async () => {
@@ -216,5 +289,37 @@ onBeforeUnmount(() => {
 
 .me-2 {
     margin-right: 0.5rem;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.6);
+    z-index: 9999;
+    padding: 1.25rem;
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 560px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    position: relative;
+    border: 4px solid rgba(188, 108, 37, 0.12);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .18s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
