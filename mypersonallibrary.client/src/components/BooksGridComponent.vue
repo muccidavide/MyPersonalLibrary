@@ -1,6 +1,6 @@
 <template>
   <div class="books-grid-component">
-    <div v-if="loading" class="loading">
+    <div v-if="isLoading" class="loading">
       Loading... Please refresh.
     </div>
     <div class="card-container">
@@ -14,7 +14,7 @@
         </div>
       </div>
     </div>
-    <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="pageSize" :total="totalItems"
+    <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="itemsPerPage" :total="totalItems"
       :default-page="1">
       <PaginationContent v-slot="{ items }">
         <PaginationPrevious />
@@ -30,8 +30,8 @@
   </div>
 </template>
 
-<script lang="js">
-import { defineComponent } from 'vue';
+<script setup>
+import { ref } from 'vue'
 import {
   Pagination,
   PaginationContent,
@@ -41,69 +41,30 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 
-export default defineComponent(
-  {
-    name: 'BooksGrid',
-    components: {
-      Pagination,
-      PaginationContent,
-      PaginationEllipsis,
-      PaginationItem,
-      PaginationNext,
-      PaginationPrevious
-    },
-    props: {
-      page: {
-        type: Number,
-        default: 1
-      },
-      books: {
-        type: Array,
-        required: true,
-        default: () => [] 
-      },
-      totalItems: {
-        type: Number,
-        required: true
-      },
-      totalPages: {
-        type: Number,
-        required: false
-      },
-      hasNextPage: {
-        type: Boolean,
-        required: false
-      },
-      hasPreviousPage: {
-        type: Boolean,
-        required: false
-      }
+defineProps({
+  page: {
+    type: Number,
+    default: 1
+  },
+  books: {
+    type: Array,
+    required: true,
+    default: () => [] 
+  },
+  totalItems: {
+    type: Number,
+    required: true
+  }
+})
 
-    },
-    data() {
-      return {
-        loading: false,
-        pageSize: 12
-      };
-    },
-    async created() {
-    },
-    watch: {
-      books(newBooks) {
-        try {
-          console.log('BooksGridComponent received books:', Array.isArray(newBooks) ? newBooks.length : typeof newBooks);
-          if (Array.isArray(newBooks) && newBooks.length > 0) {
-            console.log('First book keys:', Object.keys(newBooks[0] || {}));
-          }
-        } catch { /* noop */ }
-      }
-    },
-    methods: {
-      async handlePageChange(pageNumber) {
-        this.$emit('page-change', pageNumber, this.pageSize);
-      },
-    },
-  });
+const emit = defineEmits(['page-change'])
+
+const isLoading = ref(false)
+const itemsPerPage = ref(12)
+
+const handlePageChange = (pageNumber) => {
+  emit('page-change', pageNumber, itemsPerPage.value)
+}
 </script>
 
 <style scoped>
@@ -111,27 +72,11 @@ export default defineComponent(
   min-height: 80vh;
 }
 
-.mpl-card {
-
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-  width: 100%;
-}
-
 .card-image {
   aspect-ratio: 2 / 3;
   background-repeat: no-repeat;
   background-size: 100%;
   background-position: center;
-}
-
-.mpl-card img {
-  max-width: 100%;
-  min-width: 300px;
-  aspect-ratio: 2/3;
 }
 
 .ui-card {
@@ -147,21 +92,9 @@ export default defineComponent(
   overflow: hidden;
 }
 
-.card-title {
-  padding: 10px 15px;
-  font-size: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 .ui-card:hover {
   border: 1px solid white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transform: translateY(-5px);
-}
-
-@media screen and (max-width: 600px) {
-  .mpl-card img {
-    min-width: 80vw;
-  }
 }
 </style>
