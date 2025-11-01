@@ -2,8 +2,7 @@
         <div class="content-inner">
                 <Sidebar @search="handleSearch" @filter-change="handleFilterChange" />
                 <main class="main-content">
-                        <BooksGrid :books="allBooks" :totalItems="totalItems" :page="page" :totalPages="totalPages"
-                                :hasNextPage="hasNextPage" :hasPreviousPage="hasPreviousPage" @page-change="handlePageChange" />
+                        <BooksGrid :books="books" :totalItems="totalBooksCount" :page="currentPage" @page-change="handlePageChange" />
                 </main>
         </div>
 </template>
@@ -14,74 +13,67 @@ import Sidebar from '@/components/SidebarComponent.vue'
 import BooksGrid from '@/components/BooksGridComponent.vue'
 
 const searchTerm = ref('')
-const filters = ref({ author: '', year: '' })
-const page = ref(1)
-const pageSize = ref(12)
-const allBooks = ref([])
-const totalItems = ref(0)
-const totalPages = ref(0)
-const hasNextPage = ref(false)
-const hasPreviousPage = ref(false)
+const activeFilters = ref({ author: '', year: '' })
+const currentPage = ref(1)
+const itemsPerPage = ref(12)
+const books = ref([])
+const totalBooksCount = ref(0)
 
-let fetchTimeout = null
-let currentAbort = null
+let debounceTimeout = null
+let abortController = null
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const fetchBooks = async () => {
-    console.log('fetchBooks')
-    clearTimeout(fetchTimeout)
-    fetchTimeout = setTimeout(async () => {
-        currentAbort?.abort()
-        currentAbort = new AbortController()
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(async () => {
+        abortController?.abort()
+        abortController = new AbortController()
         try {
             const params = new URLSearchParams({
-                pageNumber: String(page.value),
-                pageSize: String(pageSize.value),
+                pageNumber: String(currentPage.value),
+                pageSize: String(itemsPerPage.value),
                 title: searchTerm.value,
-                author: filters.value.author || '',
-                year: filters.value.year || ''
+                author: activeFilters.value.author || '',
+                year: activeFilters.value.year || ''
             })
-            const res = await fetch(`${API_BASE}/api/books?${params.toString()}`, {
-                signal: currentAbort.signal
+            const response = await fetch(`${API_BASE_URL}/api/books?${params.toString()}`, {
+                signal: abortController.signal
             })
-            if (!res.ok) throw new Error('Fetch error')
-            const data = await res.json()
-            allBooks.value = data.items || []
-            totalItems.value = data.totalItems || 0
-            totalPages.value = data.totalPages || 0
-            hasNextPage.value = !!data.hasNextPage
-            hasPreviousPage.value = !!data.hasPreviousPage
-        } catch (err) {
-            if (err.name !== 'AbortError') {
-                console.error('Errore fetchBooks', err)
+            if (!response.ok) throw new Error('Errore durante il caricamento dei libri')
+            const data = await response.json()
+            books.value = data.items || []
+            totalBooksCount.value = data.totalItems || 0
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Errore durante il caricamento dei libri:', error)
             }
         }
     }, 300)
 }
 
-const handleSearch = (q) => {
-    searchTerm.value = q
-    page.value = 1
+const handleSearch = (searchQuery) => {
+    searchTerm.value = searchQuery
+    currentPage.value = 1
     fetchBooks()
 }
 
 const handleFilterChange = (newFilters) => {
-    filters.value = newFilters
-    page.value = 1
+    activeFilters.value = newFilters
+    currentPage.value = 1
     fetchBooks()
 }
 
 const handlePageChange = (newPage, newPageSize) => {
-    page.value = newPage
-    if (newPageSize != null) pageSize.value = newPageSize
+    currentPage.value = newPage
+    if (newPageSize != null) itemsPerPage.value = newPageSize
     fetchBooks()
 }
 
-onMounted(() => fetchBooks())
+onMounted(fetchBooks)
 onBeforeUnmount(() => {
-    clearTimeout(fetchTimeout)
-    currentAbort?.abort()
+    clearTimeout(debounceTimeout)
+    abortController?.abort()
 })
 </script>
 
@@ -94,11 +86,5 @@ onBeforeUnmount(() => {
     flex: 1;
     overflow-y: auto;
     padding: 1.5rem;
-}
-
-@media (max-width: 768px) {
-    .content-wrapper {
-        flex-direction: column;
-    }
 }
 </style>

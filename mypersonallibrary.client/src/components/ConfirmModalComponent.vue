@@ -18,8 +18,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
 defineProps({
     open: { type: Boolean, default: false },
     message: { type: String, required: true },

@@ -2,7 +2,7 @@
     <div class="content-inner">
         <Sidebar @search="handleSearch" @filter-change="handleFilterChange" />
         <main class="main-content">
-            <div v-if="loading" class="loading">Loading books... Please refresh.</div>
+            <div v-if="isLoadingBooks" class="loading">Loading books... Please refresh.</div>
 
             <Table v-else>
                 <TableCaption>Elenco dei libri disponibili</TableCaption>
@@ -15,25 +15,25 @@
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="book in allBooks" :key="book.id">
+                    <TableRow v-for="book in books" :key="book.id">
                         <TableCell>{{ book.title }}</TableCell>
                         <TableCell>{{ book.authors }}</TableCell>
                         <TableCell>{{ book.originalPublicationYear }}</TableCell>
                         <TableCell>
-                            <button @click="openEdit(book)" class="btn btn-sm btn-primary me-2">Edit</button>
-                            <button @click="deleteBook(book.id)" class="btn btn-sm btn-danger">Delete</button>
+                            <button @click="openEditModal(book)" class="btn btn-sm btn-primary me-2">Edit</button>
+                            <button @click="handleBookDelete(book.id)" class="btn btn-sm btn-danger">Delete</button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
 
-            <Pagination @update:page="handlePageChange" :items-per-page="pageSize" :total="totalItems"
+            <Pagination @update:page="handlePageChange" :items-per-page="itemsPerPage" :total="totalBooksCount"
                 :default-page="1">
                 <PaginationContent v-slot="{ items }">
                     <PaginationPrevious />
                     <template v-for="(item, index) in items" >
                         <PaginationItem :key="index" v-if="item.type === 'page'" :value="item.value"
-                            :is-active="item.value === page">
+                            :is-active="item.value === currentPage">
                             {{ item.value }}
                         </PaginationItem>
                     </template>
@@ -45,18 +45,18 @@
 
         <teleport to="body">
             <transition name="fade">
-                <div v-if="showEditModal" class="modal-overlay" @click.self="closeEdit" role="dialog" aria-modal="true">
+                <div v-if="isEditModalVisible" class="modal-overlay" @click.self="closeEditModal" role="dialog" aria-modal="true">
                     <div class="modal-card">
-                        <BookCardComponent v-if="selectedBook" :book="selectedBook" @save="saveEditedBook" @cancel="closeEdit" />
+                        <BookCardComponent v-if="selectedBookForEdit" :book="selectedBookForEdit" @save="handleBookSave" @cancel="closeEditModal" />
                     </div>
                 </div>
             </transition>
         </teleport>
         <ConfirmModalComponent
-            :open="showConfirmModal"
-            :message="confirmMessage"
-            @confirm="handleConfirm"
-            @cancel="handleCancel"
+            :open="isConfirmModalVisible"
+            :message="confirmationMessage"
+            @confirm="handleConfirmation"
+            @cancel="handleConfirmationCancel"
         />
     </div>
 </template>
@@ -85,29 +85,26 @@ import {
 } from '@/components/ui/pagination'
 
 const searchTerm = ref('')
-const filters = ref({ author: '', year: '' })
-const page = ref(1)
-const pageSize = ref(12)
-const allBooks = ref([])
-const totalItems = ref(0)
-const totalPages = ref(0)
-const hasNextPage = ref(false)
-const hasPreviousPage = ref(false)
-const loading = ref(false)
-const showEditModal = ref(false)
-const selectedBook = ref(null)
-const showConfirmModal = ref(false)
-const confirmMessage = ref('')
-const confirmAction = ref(null)
+const activeFilters = ref({ author: '', year: '' })
+const currentPage = ref(1)
+const itemsPerPage = ref(12)
+const books = ref([])
+const totalBooksCount = ref(0)
+const isLoadingBooks = ref(false)
+const isEditModalVisible = ref(false)
+const selectedBookForEdit = ref(null)
+const isConfirmModalVisible = ref(false)
+const confirmationMessage = ref('')
+const confirmationCallback = ref(null)
 
-let fetchTimeout = null
-let currentAbort = null
+let debounceTimeout = null
+let abortController = null
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-const editBook = async (book) => {
+const updateBook = async (book) => {
     try {
-        const res = await fetch(`${API_BASE}/api/books/${book.id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/books/${book.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -116,139 +113,130 @@ const editBook = async (book) => {
                 originalPublicationYear: book.originalPublicationYear
             })
         })
-        if (!res.ok) throw new Error('Errore durante la modifica')
-        console.log(`Libro ${book.id} modificato con successo`)
-        fetchBooks()
-    } catch (err) {
-        console.error('Errore editBook:', err)
+        if (!response.ok) throw new Error('Errore durante la modifica')
+        await fetchBooks()
+    } catch (error) {
+        console.error('Errore durante la modifica del libro:', error)
     }
 }
 
-const openEdit = (book) => {
-    selectedBook.value = { ...book }
-    showEditModal.value = true
+const openEditModal = (book) => {
+    selectedBookForEdit.value = { ...book }
+    isEditModalVisible.value = true
 }
 
-const closeEdit = () => {
-    showEditModal.value = false
-    selectedBook.value = null
+const closeEditModal = () => {
+    isEditModalVisible.value = false
+    selectedBookForEdit.value = null
 }
 
-const saveEditedBook = async (updated) => {
-    requestConfirm('Confermi il salvataggio delle modifiche?', async () => {
-        await editBook(updated)
-        closeEdit()
+const handleBookSave = async (updatedBook) => {
+    showConfirmationDialog('Confermi il salvataggio delle modifiche?', async () => {
+        await updateBook(updatedBook)
+        closeEditModal()
     })
 }
 
-const performDelete = async (bookId) => {
+const deleteBookById = async (bookId) => {
     try {
-        const res = await fetch(`${API_BASE}/api/books/${bookId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/books/${bookId}`, {
             method: 'DELETE'
         })
-        if (!res.ok) throw new Error('Errore durante l\'eliminazione')
-        console.log(`Libro ${bookId} eliminato con successo`)
-        fetchBooks()
-    } catch (err) {
-        console.error('Errore deleteBook:', err)
+        if (!response.ok) throw new Error('Errore durante l\'eliminazione')
+        await fetchBooks()
+    } catch (error) {
+        console.error('Errore durante l\'eliminazione del libro:', error)
     }
 }
 
-const deleteBook = (bookId) => {
-    requestConfirm('Sei sicuro di voler eliminare questo libro?', async () => {
-        await performDelete(bookId)
+const handleBookDelete = (bookId) => {
+    showConfirmationDialog('Sei sicuro di voler eliminare questo libro?', async () => {
+        await deleteBookById(bookId)
     })
 }
 
-const requestConfirm = (message, action) => {
-    confirmMessage.value = message
-    confirmAction.value = action
-    showConfirmModal.value = true
+const showConfirmationDialog = (message, callback) => {
+    confirmationMessage.value = message
+    confirmationCallback.value = callback
+    isConfirmModalVisible.value = true
 }
 
-const handleConfirm = async () => {
+const handleConfirmation = async () => {
     try {
-        const action = confirmAction.value
-        showConfirmModal.value = false
-        confirmAction.value = null
-        if (typeof action === 'function') {
-            await action()
+        const callback = confirmationCallback.value
+        isConfirmModalVisible.value = false
+        confirmationCallback.value = null
+        if (typeof callback === 'function') {
+            await callback()
         }
     } finally {
-        confirmMessage.value = ''
+        confirmationMessage.value = ''
     }
 }
 
-const handleCancel = () => {
-    showConfirmModal.value = false
-    confirmMessage.value = ''
-    confirmAction.value = null
+const handleConfirmationCancel = () => {
+    isConfirmModalVisible.value = false
+    confirmationMessage.value = ''
+    confirmationCallback.value = null
 }
 
 const fetchBooks = async () => {
-    clearTimeout(fetchTimeout)
-    fetchTimeout = setTimeout(async () => {
-        currentAbort?.abort()
-        currentAbort = new AbortController()
-        loading.value = true
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(async () => {
+        abortController?.abort()
+        abortController = new AbortController()
+        isLoadingBooks.value = true
         try {
             const params = new URLSearchParams({
-                pageNumber: String(page.value),
-                pageSize: String(pageSize.value),
+                pageNumber: String(currentPage.value),
+                pageSize: String(itemsPerPage.value),
                 title: searchTerm.value,
-                author: filters.value.author || '',
-                year: filters.value.year || ''
+                author: activeFilters.value.author || '',
+                year: activeFilters.value.year || ''
             })
-            const res = await fetch(`${API_BASE}/api/books?${params.toString()}`, {
-                signal: currentAbort.signal
+            const response = await fetch(`${API_BASE_URL}/api/books?${params.toString()}`, {
+                signal: abortController.signal
             })
-            if (!res.ok) throw new Error('Fetch error')
-            const data = await res.json()
-            allBooks.value = data.items || []
-            totalItems.value = data.totalItems || 0
-            totalPages.value = data.totalPages || 0
-            hasNextPage.value = !!data.hasNextPage
-            hasPreviousPage.value = !!data.hasPreviousPage
-        } catch (err) {
-            if (err.name !== 'AbortError') {
-                console.error('Errore fetchBooks', err)
+            if (!response.ok) throw new Error('Errore durante il caricamento dei libri')
+            const data = await response.json()
+            books.value = data.items || []
+            totalBooksCount.value = data.totalItems || 0
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Errore durante il caricamento dei libri:', error)
             }
         } finally {
-            loading.value = false
+            isLoadingBooks.value = false
         }
     }, 300)
 }
 
-const handleSearch = (q) => {
-    searchTerm.value = q
-    page.value = 1
+const handleSearch = (searchQuery) => {
+    searchTerm.value = searchQuery
+    currentPage.value = 1
     fetchBooks()
 }
 
 const handleFilterChange = (newFilters) => {
-    filters.value = newFilters
-    page.value = 1
+    activeFilters.value = newFilters
+    currentPage.value = 1
     fetchBooks()
 }
 
 const handlePageChange = (newPage, newPageSize) => {
-    page.value = newPage
-    if (newPageSize != null) pageSize.value = newPageSize
+    currentPage.value = newPage
+    if (newPageSize != null) itemsPerPage.value = newPageSize
     fetchBooks()
 }
 
 onMounted(fetchBooks)
 onBeforeUnmount(() => {
-    clearTimeout(fetchTimeout)
-    currentAbort?.abort()
+    clearTimeout(debounceTimeout)
+    abortController?.abort()
 })
 </script>
 
 <style scoped>
-.text-center {
-    text-align: center;
-}
-
 .content-inner {
     display: contents;
 }

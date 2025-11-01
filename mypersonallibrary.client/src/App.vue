@@ -1,5 +1,4 @@
 ﻿<template>
-
   <div class="app-container">
     <Navbar @open-login="showLogin = true" />
     <div class="content-wrapper">
@@ -23,14 +22,15 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Navbar from './components/NavBarComponent.vue'
 import Login from './components/LoginComponent.vue'
 import { RouterView } from 'vue-router'
+import router from './routes/routes'
 
 const showLogin = ref(false)
 
 const close = () => (showLogin.value = false)
 
-const handleLogin = async (credentials) => {
-  // integra qui la chiamata API di autenticazione
-  console.log('Login richiesto', credentials)
+const handleLogin = async () => {
+  // TODO: integra qui la chiamata API di autenticazione
+  router.push('/dashboard')
   showLogin.value = false
 }
 
