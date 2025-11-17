@@ -1,0 +1,10 @@
+namespace MyPersonalLibrary.Server.Models.DTOs
+{
+    public sealed record UserInfoDto
+    {
+        public int UserId { get; init; }
+        public string Username { get; init; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
+        public string Role { get; init; } = string.Empty;
+    }
+}

@@ -1,6 +1,6 @@
 ﻿using MyPersonalLibrary.Server.Models;
 
-namespace MyPersonalLibrary.Server.Repositories
+namespace MyPersonalLibrary.Server.Repositories.Interfaces
 {
     public interface IBookRepository
     {

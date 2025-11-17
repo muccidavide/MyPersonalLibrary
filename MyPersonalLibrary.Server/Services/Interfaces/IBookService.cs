@@ -1,7 +1,7 @@
 ﻿using MyPersonalLibrary.Server.Models.DTOs;
 using MyPersonalLibrary.Server.Models.Utils;
 
-namespace MyPersonalLibrary.Server.Services
+namespace MyPersonalLibrary.Server.Services.Interfaces
 {
     public interface IBookService
     {

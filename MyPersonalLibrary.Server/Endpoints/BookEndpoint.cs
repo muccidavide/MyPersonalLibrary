@@ -1,7 +1,8 @@
-﻿using MyPersonalLibrary.Server.Models;
+﻿// Endpoints/BookEndpoints.cs
+using MyPersonalLibrary.Server.Models;
 using MyPersonalLibrary.Server.Models.DTOs;
 using MyPersonalLibrary.Server.Models.Utils;
-using MyPersonalLibrary.Server.Services;
+using MyPersonalLibrary.Server.Services.Interfaces;
 
 namespace MyPersonalLibrary.Server.Endpoints
 {
@@ -12,11 +13,17 @@ namespace MyPersonalLibrary.Server.Endpoints
             var booksGroup = app.MapGroup("/api/books")
                                 .WithTags("Books API");
 
-            booksGroup.MapGet("/", async (int pageNumber, int pageSize, string? title, string? author, string? year , IBookService service) =>
-                await service.GetPaginatedBooksAsync(pageNumber, pageSize, title, author, year)
-                    is PaginatedResult<BookDto> book
-                    ? Results.Ok(book)
-                    : Results.NotFound());
+            booksGroup.MapGet("/", async (
+                int pageNumber,
+                int pageSize,
+                string? title,
+                string? author,
+                string? year,
+                IBookService service) =>
+                    await service.GetPaginatedBooksAsync(pageNumber, pageSize, title, author, year)
+                        is PaginatedResult<BookDto> book
+                        ? Results.Ok(book)
+                        : Results.NotFound());
 
             booksGroup.MapGet("/{id}", async (int id, IBookService service) =>
                 await service.GetBookByIdAsync(id)
@@ -28,14 +35,34 @@ namespace MyPersonalLibrary.Server.Endpoints
             {
                 var book = await service.AddBookAsync(bookDto);
                 return Results.Created($"/api/books/{book.Id}", book);
-            });
+            })
+            .RequireAuthorization("AdminOnly")
+            .WithName("CreateBook")
+            .Produces<BookDto>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
 
             booksGroup.MapPut("/{id}", async (int id, BookDto bookDto, IBookService service) =>
-                 await service.UpdateBookAsync(id, bookDto) ? Results.NoContent() : Results.NotFound());
+                 await service.UpdateBookAsync(id, bookDto)
+                    ? Results.NoContent()
+                    : Results.NotFound())
+            .RequireAuthorization("AdminOnly")
+            .WithName("UpdateBook")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
 
             booksGroup.MapDelete("/{id}", async (int id, IBookService service) =>
-                 await service.DeleteBookAsync(id) ? Results.NoContent() : Results.NotFound()
-            );
+                 await service.DeleteBookAsync(id)
+                    ? Results.NoContent()
+                    : Results.NotFound())
+            .RequireAuthorization("AdminOnly")
+            .WithName("DeleteBook")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
         }
     }
 }

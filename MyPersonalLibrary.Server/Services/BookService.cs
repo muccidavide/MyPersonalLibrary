@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using MyPersonalLibrary.Server.Models.DTOs;
 using MyPersonalLibrary.Server.Models.Utils;
-using MyPersonalLibrary.Server.Repositories;
+using MyPersonalLibrary.Server.Repositories.Interfaces;
+using MyPersonalLibrary.Server.Services.Interfaces;
 
 namespace MyPersonalLibrary.Server.Services
 {
