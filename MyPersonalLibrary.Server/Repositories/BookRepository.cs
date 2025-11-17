@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyPersonalLibrary.Server.Models;
 using MyPersonalLibrary.Server.Models.Context;
+using MyPersonalLibrary.Server.Repositories.Interfaces;
 
 namespace MyPersonalLibrary.Server.Repositories
 {
