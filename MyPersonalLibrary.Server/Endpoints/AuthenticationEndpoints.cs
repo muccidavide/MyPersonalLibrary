@@ -4,15 +4,15 @@
     using Microsoft.AspNetCore.Mvc;
     using System.Security.Claims;
     using MyPersonalLibrary.Server.Services.Interfaces;
+    using Microsoft.AspNetCore.Builder;
 
     public static class AuthenticationEndpoints
     {
-        public static void MapAuthenticationEndpoints(this WebApplication app)
+        public static void MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
         {
             var authGroup = app.MapGroup("/api/authentication")
                                .WithTags("Authentication API");
 
-            // POST /api/authentication/login
             authGroup.MapPost("/login", async (
                 [FromBody] LoginRequestDto loginRequest,
                 IAuthenticationService authService,
@@ -28,7 +28,6 @@
             .Produces<LoginResponseDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
-            // POST /api/authentication/register
             authGroup.MapPost("/register", async (
                 [FromBody] RegisterRequestDto registerRequest,
                 IAuthenticationService authService,
@@ -49,7 +48,6 @@
             .Produces<LoginResponseDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest);
 
-            // POST /api/authentication/refresh
             authGroup.MapPost("/refresh", async (
                 [FromBody] RefreshTokenRequestDto refreshRequest,
                 IAuthenticationService authService,
@@ -65,7 +63,6 @@
             .Produces<LoginResponseDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
-            // POST /api/authentication/logout
             authGroup.MapPost("/logout", async (
                 [FromBody] RefreshTokenRequestDto refreshRequest,
                 IAuthenticationService authService,
@@ -78,7 +75,6 @@
             .WithDescription("Effettua il logout revocando il refresh token")
             .Produces(StatusCodes.Status200OK);
 
-            // POST /api/authentication/logout-all
             authGroup.MapPost("/logout-all", async (
                 HttpContext httpContext,
                 IAuthenticationService authService,
@@ -100,7 +96,6 @@
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
-            // GET /api/authentication/me
             authGroup.MapGet("/me", (HttpContext httpContext) =>
             {
                 var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
