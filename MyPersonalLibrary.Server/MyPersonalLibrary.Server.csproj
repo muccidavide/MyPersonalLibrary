@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<BuildClient Condition="'$(BuildClient)' == ''">true</BuildClient>
+		<UserSecretsId>ed4bad6c-3fad-4eda-8de8-8fcdbad9b10b</UserSecretsId>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -37,7 +38,8 @@
 		<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.1" />
-		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.4" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.4" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
 	</ItemGroup>
 
