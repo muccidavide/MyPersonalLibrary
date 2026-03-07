@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="app-container">
     <Navbar @open-login="showLogin = true" />
     <div class="content-wrapper">
@@ -30,8 +30,8 @@ const showLogin = ref(false)
 const close = () => (showLogin.value = false)
 
 const handleLogin = async () => {
-  router.push('/dashboard')
-  showLogin.value = false
+  showLogin.value = false  
+  await router.push('/dashboard') 
 }
 
 const onKey = (e) => e.key === 'Escape' && close()
