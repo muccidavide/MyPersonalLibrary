@@ -4,7 +4,7 @@ const ROLES = {
 };
 
 const PERMISSIONS = {
-  [ROLES.USER]: ['read'],            
+  [ROLES.EDITOR]: ['read', 'write'],            
   [ROLES.ADMIN]: ['read', 'write', 'delete'] 
 };
 
