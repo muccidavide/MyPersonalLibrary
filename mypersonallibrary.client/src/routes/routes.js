@@ -12,7 +12,7 @@ const routes = [
     component: () => import('../views/DashboardView.vue'),
     meta: {
       requiresAuth: true,
-      allowedRoles: [ROLES.ADMIN]
+      allowedRoles: [ROLES.ADMIN, ROLES.EDITOR]
     }
   },
 ]
