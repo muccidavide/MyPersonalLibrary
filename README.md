@@ -1,60 +1,118 @@
-# 📚 MyPersonalLibrary - Full-Stack Library Catalog
+# MyPersonalLibrary
 
-## Project Overview
+A **full-stack web application** built to explore modern backend architecture using **ASP.NET Core, Vue.js and SQL Server / Azure SQL**.
 
-**MyPersonalLibrary** is a full-stack demonstration application designed to catalog and manage a personal book collection. This project was developed as a practical exercise to showcase end-to-end development skills.
+The project focuses on **API design, data access patterns, and application observability** rather than the domain itself.
+The frontend is implemented as a **Single Page Application (SPA)** that communicates with a REST API backend.
 
-The application allows users to quickly search for books within their catalog and perform comprehensive **CRUD** (Create, Read, Update, Delete) operations for managing book entries.
+---
 
------
+## 🏗 Architecture
 
-## Technology Stack
+The system follows a **SPA + API architecture**, keeping the frontend completely separated from the backend and data layer.
 
-The project leverages a modern and industry-standard technology stack:
+```
+Vue.js SPA
+     │
+     │ HTTP / JSON
+     ▼
+ASP.NET Core Web API
+     │
+     │ Entity Framework Core
+     ▼
+SQL Server / Azure SQL
+```
 
-| Component | Technology | Description |
-| :--- | :--- | :--- |
-| **Database** | **SQL Server** | Stores catalog data (titles, authors, publication years, ISBNs, etc.). |
-| **Backend / API** | **.NET (C#)** | Implements a RESTful API to handle business logic and database interactions. |
-| **Frontend** | **Vue.js** | Provides a dynamic and reactive user interface (UI) for catalog display and CRUD form management. |
+Key architectural aspects:
 
------
+* layered backend architecture *(Controllers → Services → Data Access)*
+* **RESTful API design**
+* **Entity Framework Core** for persistence
+* **server-side filtering and pagination**
+* **centralized exception handling**
+* **structured logging** (database + file)
 
-## Key Features
+---
 
-### 🔍 End-User Functionality
+## ⚙ Backend
 
-  * **Advanced Search (with lazy loading):** Filter the catalog by title, author, publication year, or ISBN. The advanced search is implemented with lazy loading to fetch results on-demand and improve performance on both client and server sides.
-  * **Catalog Browsing:** Intuitive and paginated navigation through the entire library.
-  * **Book Details:** View comprehensive metadata for each book entry.
+The backend is implemented using **ASP.NET Core Web API** and focuses on clean separation of responsibilities.
 
-  * **Global Exception Handling:** Centralized exception handling implemented in the API and propagated to the frontend for consistent error responses and improved reliability.
-  * **Centralized Logging:** Application logs are persisted to both the database and log files to simplify monitoring and troubleshooting.
+Notable implementation aspects:
 
-### ⚙️ Management Functionality (CRUD)
+* **global exception handling middleware**
+* **repository / service pattern**
+* **LINQ-based querying** with Entity Framework Core
+* consistent API response handling
+* logging persisted to **database and log files** for observability
 
-  * **C - Create:** Add new books to the database via a dedicated form.
-  * **R - Read:** Retrieve and display all books or a single record.
-  * **U - Update:** Modify the details of an existing book.
-  * **D - Delete:** Permanently remove a book from the catalog.
+These patterns improve **maintainability, debugging and extensibility**.
 
------
+---
 
-## Architecture and Design
+## 🧩 Frontend
 
-The project employs a three-tier architecture:
+The frontend is built with **Vue.js** as a **Single Page Application**.
 
-1.  **Data Layer (SQL Server):** Optimized table structure for efficient searching.
-2.  **Logic/API Layer (.NET):** The API uses a **Repository Pattern** or **Service Layer** approach to separate business logic from data access, ensuring clean and testable code.
-3.  **Presentation Layer (Vue.js):** The frontend communicates with the API via HTTP/Axios calls, operating as a **Single Page Application (SPA)** for a smooth user experience.
+The UI communicates with the API through **Axios HTTP calls**, allowing the interface to dynamically update without full page reloads.
 
------
+Main characteristics:
 
-## Portfolio Objectives
+* component-based architecture
+* reactive UI updates
+* API-driven data flow
 
-This project was developed to demonstrate the following technical skills:
+---
 
-  * **Full-Stack Proficiency:** Managing the entire application lifecycle from database design to frontend deployment.
-  * **RESTful API Design:** Implementing clean and efficient data access endpoints using .NET.
-  * **Frontend State Management:** Building a reactive UI with Vue.js, demonstrating efficient component design and data flow.
-  * **Data Integration:** Practical application of database connectivity and manipulation (e.g., via Entity Framework Core).
+## 🗄 Data Layer
+
+The application uses **SQL Server**, with compatibility for **Azure SQL Database**.
+
+Persistence is managed through **Entity Framework Core**, enabling:
+
+* strongly-typed queries
+* migrations and schema evolution
+* efficient search and filtering
+
+## 🧠 Architecture Diagram
+
+A simplified view of the application components and interactions.
+
+```
+            ┌───────────────────┐
+            │     Vue.js SPA    │
+            │  (Client / UI)    │
+            └─────────┬─────────┘
+                      │ HTTP / JSON
+                      ▼
+            ┌───────────────────┐
+            │ ASP.NET Core API  │
+            │ Controllers       │
+            │ Services          │
+            │ Repositories      │
+            └─────────┬─────────┘
+                      │
+                      ▼
+            ┌───────────────────┐
+            │ Entity Framework  │
+            │ Core (ORM)        │
+            └─────────┬─────────┘
+                      │
+                      ▼
+            ┌───────────────────┐
+            │ SQL Server /      │
+            │ Azure SQL DB      │
+            └───────────────────┘
+```
+
+---
+
+## 🚀 Technical Focus
+
+This project was created to demonstrate practical experience with:
+
+* **ASP.NET Core API development**
+* **SPA architectures**
+* **Entity Framework Core data access**
+* **structured logging and exception handling**
+* **SQL-based persistence in a cloud-ready environment**
