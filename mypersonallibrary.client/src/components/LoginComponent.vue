@@ -5,27 +5,15 @@
     <form @submit.prevent="onSubmit" novalidate class="form">
       <div class="form-group">
         <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          v-model="email"
-          :class="{'input-error': errors.email}"
-          placeholder="nome@esempio.com"
-          autocomplete="username email"
-        />
+        <input id="email" type="email" v-model="email" :class="{ 'input-error': errors.email }"
+          placeholder="nome@esempio.com" autocomplete="username email" />
         <div v-if="errors.email" class="error">{{ errors.email }}</div>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          v-model="password"
-          :class="{'input-error': errors.password}"
-          placeholder="La tua password"
-          autocomplete="current-password"
-        />
+        <input id="password" type="password" v-model="password" :class="{ 'input-error': errors.password }"
+          placeholder="La tua password" autocomplete="current-password" />
         <div v-if="errors.password" class="error">{{ errors.password }}</div>
       </div>
 
@@ -42,8 +30,10 @@
 </template>
 
 <script setup lang="js">
+import router from '@/routes/routes'
 import { ref, reactive } from 'vue'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const emit = defineEmits(['login'])
 
 const email = ref('')
@@ -79,7 +69,36 @@ async function onSubmit() {
 
   loading.value = true
   try {
-    emit('login', { email: email.value, password: password.value })
+
+    const payload = {
+      email: email.value,
+      password: password.value
+    };
+
+    fetch(`${API_BASE_URL}/api/authentication/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('expiresAt', data.accessTokenExpiresAtUtc);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        emit('login')
+        return data;
+      })
+      .catch((error) => {
+        console.error('Login error:', error);
+      });
   } catch (err) {
     submitError.value = 'Errore durante l\'invio. Riprova.'
     console.error('Errore durante l\'invio', err)
@@ -96,7 +115,7 @@ async function onSubmit() {
   padding: 1.25rem;
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
 .title {
@@ -125,7 +144,7 @@ input {
 
 .input-error {
   border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
 }
 
 .error {

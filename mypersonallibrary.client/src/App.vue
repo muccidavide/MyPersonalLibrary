@@ -4,17 +4,17 @@
     <div class="content-wrapper">
       <RouterView />
     </div>
-  <teleport to="body">
-    <transition name="fade">
-      <div v-if="showLogin" class="modal-overlay" @click.self="close" role="dialog" aria-modal="true">
-        <div class="modal-card">
-          <button class="modal-close" @click="close" aria-label="Chiudi">✕</button>
-          <Login @login="handleLogin" />
+    <teleport to="body">
+      <transition name="fade">
+        <div v-if="showLogin" class="modal-overlay" @click.self="close" role="dialog" aria-modal="true">
+          <div class="modal-card">
+            <button class="modal-close" @click="close" aria-label="Chiudi">✕</button>
+            <Login @login="handleLogin" />
+          </div>
         </div>
-      </div>
-    </transition>
-  </teleport>
-</div>
+      </transition>
+    </teleport>
+  </div>
 </template>
 
 <script setup>
@@ -24,12 +24,12 @@ import Login from './components/LoginComponent.vue'
 import { RouterView } from 'vue-router'
 import router from './routes/routes'
 
+
 const showLogin = ref(false)
 
 const close = () => (showLogin.value = false)
 
 const handleLogin = async () => {
-  // TODO: integra qui la chiamata API di autenticazione
   router.push('/dashboard')
   showLogin.value = false
 }

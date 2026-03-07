@@ -11,7 +11,7 @@
                         <TableHead>Titolo</TableHead>
                         <TableHead>Autore</TableHead>
                         <TableHead>Anno</TableHead>
-                        <TableHead >Azioni</TableHead>
+                        <TableHead>Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -31,7 +31,7 @@
                 :default-page="1">
                 <PaginationContent v-slot="{ items }">
                     <PaginationPrevious />
-                    <template v-for="(item, index) in items" >
+                    <template v-for="(item, index) in items">
                         <PaginationItem :key="index" v-if="item.type === 'page'" :value="item.value"
                             :is-active="item.value === currentPage">
                             {{ item.value }}
@@ -45,19 +45,17 @@
 
         <teleport to="body">
             <transition name="fade">
-                <div v-if="isEditModalVisible" class="modal-overlay" @click.self="closeEditModal" role="dialog" aria-modal="true">
+                <div v-if="isEditModalVisible" class="modal-overlay" @click.self="closeEditModal" role="dialog"
+                    aria-modal="true">
                     <div class="modal-card">
-                        <BookCardComponent v-if="selectedBookForEdit" :book="selectedBookForEdit" @save="handleBookSave" @cancel="closeEditModal" />
+                        <BookCardComponent v-if="selectedBookForEdit" :book="selectedBookForEdit" @save="handleBookSave"
+                            @cancel="closeEditModal" />
                     </div>
                 </div>
             </transition>
         </teleport>
-        <ConfirmModalComponent
-            :open="isConfirmModalVisible"
-            :message="confirmationMessage"
-            @confirm="handleConfirmation"
-            @cancel="handleConfirmationCancel"
-        />
+        <ConfirmModalComponent :open="isConfirmModalVisible" :message="confirmationMessage"
+            @confirm="handleConfirmation" @cancel="handleConfirmationCancel" />
     </div>
 </template>
 
@@ -104,9 +102,13 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const updateBook = async (book) => {
     try {
+        const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_BASE_URL}/api/books/${book.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({
                 title: book.title,
                 authors: book.authors,
@@ -139,8 +141,14 @@ const handleBookSave = async (updatedBook) => {
 
 const deleteBookById = async (bookId) => {
     try {
+        const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_BASE_URL}/api/books/${bookId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+
         })
         if (!response.ok) throw new Error('Errore durante l\'eliminazione')
         await fetchBooks()
