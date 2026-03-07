@@ -17,7 +17,6 @@ function handleLogin(credentials) {
   showLogin.value = false
 }
 
-// Gestione ESC per chiudere il modal
 function onKey(e) {
   if (e.key === 'Escape') close()
 }
@@ -34,7 +33,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
     </div>
   </div>
 
-  <!-- Teleport: monta il modal direttamente in <body> per evitare problemi di stacking/overflow -->
   <teleport to="body">
     <transition name="fade">
       <div v-if="showLogin" class="modal-overlay" @click.self="close" aria-hidden="false">
@@ -61,19 +59,17 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   overflow: hidden;
 }
 
-/* overlay fissato e centrato */
 .modal-overlay {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.6); /* semi-trasparente scuro */
-  z-index: 9999; /* abbastanza alto da sovrastare il layout */
+  background: rgba(15, 23, 42, 0.6); 
+  z-index: 9999; 
   padding: 1.25rem;
 }
 
-/* card centrata con palette del sito */
 .modal-card {
   width: 100%;
   max-width: 520px;
@@ -82,10 +78,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   padding: 1rem;
   position: relative;
-  border: 4px solid rgba(188,108,37,0.12); /* palette coerente */
+  border: 4px solid rgba(188,108,37,0.12); 
 }
 
-/* bottone chiudi */
 .modal-close {
   position: absolute;
   top: 8px;
@@ -97,10 +92,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   color: #374151;
 }
 
-/* transizioni semplici */
 .fade-enter-active, .fade-leave-active {
   transition: opacity .18s ease;
 }
+
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }

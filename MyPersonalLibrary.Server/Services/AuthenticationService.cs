@@ -32,13 +32,14 @@
             LoginRequestDto loginRequest,
             CancellationToken cancellationToken = default)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(
-                loginRequest.Username,
+
+            var user = await _userRepository.GetUserByEmailAsync(
+                loginRequest.Email,
                 cancellationToken);
 
             if (user is null)
             {
-                _logger.LogWarning("Tentativo di login fallito: username '{Username}' non trovato", loginRequest.Username);
+                _logger.LogWarning("Tentativo di login fallito: email '{Email}' non trovato", loginRequest.Email);
                 return null;
             }
 
@@ -48,7 +49,7 @@
 
             if (!isPasswordValid)
             {
-                _logger.LogWarning("Tentativo di login fallito: password errata per username '{Username}'", loginRequest.Username);
+                _logger.LogWarning("Tentativo di login fallito: password errata per email '{Email}'", loginRequest.Email);
                 return null;
             }
 

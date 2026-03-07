@@ -14,10 +14,12 @@
             </div>
         </transition>
     </teleport>
-    
+
 </template>
 
 <script setup>
+const emit = defineEmits(['confirm', 'cancel'])
+
 defineProps({
     open: { type: Boolean, default: false },
     message: { type: String, required: true },
@@ -96,5 +98,3 @@ defineProps({
     opacity: 0;
 }
 </style>
-
-
