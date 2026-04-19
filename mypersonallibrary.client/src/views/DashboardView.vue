@@ -1,10 +1,13 @@
 <template>
     <div class="content-inner">
-        <Sidebar @search="handleSearch" @filter-change="handleFilterChange" />
+        <Sidebar :collapsed="!isSidebarOpen" @search="handleSearch" @filter-change="handleFilterChange" @toggle="isSidebarOpen = !isSidebarOpen" />
         <main class="main-content">
-            <div v-if="isLoadingBooks" class="loading">Loading books... Please refresh.</div>
+            <div class="main-wrapper">
+                <h1 class="text-2xl font-bold tracking-tight m-0 mb-6">Libreria</h1>
 
-            <Table v-else>
+                <div v-if="isLoadingBooks" class="loading">Loading books... Please refresh.</div>
+
+                <Table v-else>
                 <TableCaption>Elenco dei libri disponibili</TableCaption>
                 <TableHeader>
                     <TableRow>
@@ -20,8 +23,10 @@
                         <TableCell>{{ book.authors }}</TableCell>
                         <TableCell>{{ book.originalPublicationYear }}</TableCell>
                         <TableCell>
-                            <button @click="openEditModal(book)" class="btn btn-sm btn-primary me-2">Edit</button>
-                            <button @click="handleBookDelete(book.id)" class="btn btn-sm btn-danger">Delete</button>
+                            <button @click="openEditModal(book)"
+                                class="btn btn-sm btn-primary" >Edit</button>
+                            <button @click="handleBookDelete(book.id)"
+                                class="btn btn-red btn-sm btn-destructive ms-2">Delete</button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -41,13 +46,15 @@
                     <PaginationNext />
                 </PaginationContent>
             </Pagination>
+            </div>
         </main>
 
         <teleport to="body">
             <transition name="fade">
-                <div v-if="isEditModalVisible" class="modal-overlay" @click.self="closeEditModal" role="dialog"
-                    aria-modal="true">
-                    <div class="modal-card">
+                <div v-if="isEditModalVisible"
+                    class="fixed inset-0 flex items-center justify-center bg-[rgba(6,6,7,0.6)] z-[9999] p-5"
+                    @click.self="closeEditModal" role="dialog" aria-modal="true">
+                    <div class="w-full max-w-[560px] bg-surface rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.25)] p-4 relative border border-border">
                         <BookCardComponent v-if="selectedBookForEdit" :book="selectedBookForEdit" @save="handleBookSave"
                             @cancel="closeEditModal" />
                     </div>
@@ -82,6 +89,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination'
 
+const isSidebarOpen = ref(true)
 const searchTerm = ref('')
 const activeFilters = ref({ author: '', year: '' })
 const currentPage = ref(1)
@@ -251,62 +259,22 @@ onBeforeUnmount(() => {
 
 .main-content {
     flex: 1;
+    min-width: 0;
     overflow-y: auto;
-    padding: 1.5rem;
+    padding: 2rem 2.5rem;
+    transition: padding 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.main-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    transition: max-width 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .loading {
     padding: 1rem;
-    font-weight: bold;
-}
-
-.btn {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    border: none;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-}
-
-.btn-sm {
-    padding: 0.2rem 0.4rem;
-}
-
-.me-2 {
-    margin-right: 0.5rem;
-}
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(15, 23, 42, 0.6);
-    z-index: 9999;
-    padding: 1.25rem;
-}
-
-.modal-card {
-    width: 100%;
-    max-width: 560px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    padding: 1rem;
-    position: relative;
-    border: 4px solid rgba(188, 108, 37, 0.12);
+    font-weight: 500;
+    color: var(--muted-foreground);
 }
 
 .fade-enter-active,
@@ -317,5 +285,14 @@ onBeforeUnmount(() => {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+.btn{
+    width: 60px;
+}
+
+.btn-red{
+    background-color: red;
+    color: white;
 }
 </style>
