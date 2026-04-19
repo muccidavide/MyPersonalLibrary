@@ -1,32 +1,55 @@
 <template>
-  <div class="books-grid-component">
-    <div v-if="isLoading" class="loading">
+  <div class="books-grid-component flex flex-col h-full min-h-0">
+    <div v-if="isLoading" class="flex-1 flex items-center justify-center text-content-muted">
       Loading... Please refresh.
     </div>
-    <div class="card-container">
-      <div class="row">
-        <div v-for="book in books" :key="book.id"
-          class="col-12 col-lg-4  col-xl-2 text-center my-3 justify-content-center d-flex">
-          <div class="ui-card">
-            <div class="card-image" :style="{ backgroundImage: `url(${book.imageUrl})` }">
-            </div>
-          </div>
-        </div>
-      </div>
+
+    <div v-else-if="!books.length" class="flex-1 flex items-center justify-center text-content-muted">
+      Nessun libro trovato.
     </div>
-    <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="itemsPerPage" :total="totalItems"
-      :default-page="1">
-      <PaginationContent v-slot="{ items }">
-        <PaginationPrevious />
-        <template v-for="(item, index) in items">
-          <PaginationItem :key="index" v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
-            {{ item.value }}
-          </PaginationItem>
-        </template>
-        <PaginationEllipsis :index="4" />
-        <PaginationNext />
-      </PaginationContent>
-    </Pagination>
+
+    <div v-else class="flex-1 min-h-0 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+      <article
+        v-for="book in books"
+        :key="book.id"
+        class="book-card group relative overflow-hidden rounded-xl shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl aspect-[3/4]"
+        @click="$emit('book-click', book)"
+      >
+        <div
+          class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+          :style="coverStyle(book)"
+          role="img"
+          :aria-label="book.title || 'Cover libro'"
+        ></div>
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+        <div class="relative h-full flex flex-col justify-end py-2.5 px-3.5 text-white">
+          <h3 class="book-card__title font-display font-bold leading-tight line-clamp-2 drop-shadow-md">
+            {{ book.title || 'Titolo sconosciuto' }}
+          </h3>
+          <p class="text-[10px] text-white/80 line-clamp-1 leading-snug mt-0.5">
+            {{ book.authors || 'Autore sconosciuto' }}
+          </p>
+        </div>
+      </article>
+    </div>
+
+    <nav v-if="totalItems > 0" class="shrink-0 flex justify-center pt-4" aria-label="Paginazione libri">
+      <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="itemsPerPage" :total="totalItems"
+        :default-page="1">
+        <PaginationContent v-slot="{ items }" class="flex flex-wrap items-center gap-1">
+          <PaginationPrevious />
+          <template v-for="(item, index) in items">
+            <PaginationItem :key="index" v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+              {{ item.value }}
+            </PaginationItem>
+          </template>
+          <PaginationEllipsis :index="4" />
+          <PaginationNext />
+        </PaginationContent>
+      </Pagination>
+    </nav>
   </div>
 </template>
 
@@ -49,7 +72,7 @@ defineProps({
   books: {
     type: Array,
     required: true,
-    default: () => [] 
+    default: () => []
   },
   totalItems: {
     type: Number,
@@ -57,10 +80,16 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['page-change'])
+const emit = defineEmits(['page-change', 'book-click'])
 
 const isLoading = ref(false)
-const itemsPerPage = ref(12)
+const itemsPerPage = ref(24)
+
+const FALLBACK_GRADIENT = 'linear-gradient(135deg, #4752C4 0%, #7A84F6 100%)'
+
+const coverStyle = (book) => ({
+  backgroundImage: book?.imageUrl ? `url(${book.imageUrl})` : FALLBACK_GRADIENT,
+})
 
 const handlePageChange = (pageNumber) => {
   emit('page-change', pageNumber, itemsPerPage.value)
@@ -68,33 +97,11 @@ const handlePageChange = (pageNumber) => {
 </script>
 
 <style scoped>
-.card-container {
-  min-height: 80vh;
+.book-card {
+  background: var(--card);
 }
 
-.card-image {
-  aspect-ratio: 2 / 3;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: center;
-}
-
-.ui-card {
-  background: #f0efe1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 3px;
-  border: 1px solid transparent;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.ui-card:hover {
-  border: 1px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transform: translateY(-5px);
+.book-card__title {
+  font-size: 11px;
 }
 </style>

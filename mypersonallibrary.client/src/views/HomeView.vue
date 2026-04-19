@@ -1,10 +1,14 @@
 <template>
-        <div class="content-inner">
-                <Sidebar @search="handleSearch" @filter-change="handleFilterChange" />
-                <main class="main-content">
-                        <BooksGrid :books="books" :totalItems="totalBooksCount" :page="currentPage" @page-change="handlePageChange" />
-                </main>
-        </div>
+    <div class="content-inner">
+        <Sidebar :collapsed="!isSidebarOpen" @search="handleSearch" @filter-change="handleFilterChange" @toggle="isSidebarOpen = !isSidebarOpen" />
+        <main class="main-content">
+            <div class="main-wrapper">
+                <h1 class="text-2xl font-bold tracking-tight m-0 mb-4 shrink-0">Libreria</h1>
+
+                <BooksGrid class="flex-1 min-h-0" :books="books" :totalItems="totalBooksCount" :page="currentPage" @page-change="handlePageChange" />
+            </div>
+        </main>
+    </div>
 </template>
 
 <script setup>
@@ -12,10 +16,11 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Sidebar from '@/components/SidebarComponent.vue'
 import BooksGrid from '@/components/BooksGridComponent.vue'
 
+const isSidebarOpen = ref(true)
 const searchTerm = ref('')
 const activeFilters = ref({ author: '', year: '' })
 const currentPage = ref(1)
-const itemsPerPage = ref(12)
+const itemsPerPage = ref(24)
 const books = ref([])
 const totalBooksCount = ref(0)
 
@@ -84,7 +89,23 @@ onBeforeUnmount(() => {
 
 .main-content {
     flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    transition: padding 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.main-wrapper {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    transition: max-width 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 </style>
