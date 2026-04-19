@@ -1,7 +1,7 @@
 <template>
   <div class="books-grid-component flex flex-col h-full min-h-0">
     <div v-if="isLoading" class="flex-1 flex items-center justify-center text-content-muted">
-      Loading... Please refresh.
+      Caricamento in corso...
     </div>
 
     <div v-else-if="!books.length" class="flex-1 flex items-center justify-center text-content-muted">
@@ -85,12 +85,15 @@ defineProps({
   totalItems: {
     type: Number,
     required: true
+  },
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['page-change', 'book-click', 'view-details'])
 
-const isLoading = ref(false)
 const itemsPerPage = ref(24)
 const selectedBook = ref(null)
 const isDetailsModalOpen = ref(false)
