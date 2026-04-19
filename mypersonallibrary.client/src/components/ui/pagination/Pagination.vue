@@ -26,7 +26,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
     v-slot="slotProps"
     data-slot="pagination"
     v-bind="forwarded"
-    :class="cn('mx-auto flex w-full justify-center', props.class)"
+    :class="cn('mx-auto flex w-full justify-center fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md py-3 border-t border-gray-200 dark:border-gray-800 sm:static sm:bg-transparent sm:dark:bg-transparent sm:backdrop-blur-none sm:py-0 sm:border-none', props.class)"
   >
     <slot v-bind="slotProps" />
   </PaginationRoot>
