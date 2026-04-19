@@ -13,7 +13,7 @@
         v-for="book in books"
         :key="book.id"
         class="book-card group relative overflow-hidden rounded-xl shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl aspect-[3/4]"
-        @click="$emit('book-click', book)"
+        @click="onBookClick(book)"
       >
         <div
           class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
@@ -34,6 +34,13 @@
         </div>
       </article>
     </div>
+
+    <BookDetailsModal
+      :open="isDetailsModalOpen"
+      :book="selectedBook"
+      @close="closeDetailsModal"
+      @view-details="onViewDetails"
+    />
 
     <nav v-if="totalItems > 0" class="shrink-0 flex justify-center pt-4" aria-label="Paginazione libri">
       <Pagination @update:page="handlePageChange" v-slot="{ page }" :items-per-page="itemsPerPage" :total="totalItems"
@@ -63,6 +70,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import BookDetailsModal from '@/components/BookDetailsModalComponent.vue'
 
 defineProps({
   page: {
@@ -80,10 +88,12 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['page-change', 'book-click'])
+const emit = defineEmits(['page-change', 'book-click', 'view-details'])
 
 const isLoading = ref(false)
 const itemsPerPage = ref(24)
+const selectedBook = ref(null)
+const isDetailsModalOpen = ref(false)
 
 const FALLBACK_GRADIENT = 'linear-gradient(135deg, #4752C4 0%, #7A84F6 100%)'
 
@@ -93,6 +103,20 @@ const coverStyle = (book) => ({
 
 const handlePageChange = (pageNumber) => {
   emit('page-change', pageNumber, itemsPerPage.value)
+}
+
+const onBookClick = (book) => {
+  selectedBook.value = book
+  isDetailsModalOpen.value = true
+  emit('book-click', book)
+}
+
+const closeDetailsModal = () => {
+  isDetailsModalOpen.value = false
+}
+
+const onViewDetails = (book) => {
+  emit('view-details', book)
 }
 </script>
 
