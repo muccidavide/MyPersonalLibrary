@@ -68,9 +68,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   opacity: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
   .content-wrapper {
     flex-direction: column;
+    overflow: visible;
   }
 }
 </style>
