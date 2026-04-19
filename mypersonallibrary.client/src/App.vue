@@ -6,9 +6,13 @@
     </div>
     <teleport to="body">
       <transition name="fade">
-        <div v-if="showLogin" class="modal-overlay" @click.self="close" role="dialog" aria-modal="true">
-          <div class="modal-card">
-            <button class="modal-close" @click="close" aria-label="Chiudi">✕</button>
+        <div v-if="showLogin"
+          class="fixed inset-0 flex items-center justify-center bg-[rgba(6,6,7,0.6)] z-[9999] p-5"
+          @click.self="close" role="dialog" aria-modal="true">
+          <div class="w-full max-w-[520px] bg-surface rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.25)] p-4 relative border border-border">
+            <button
+              class="absolute top-2 right-2 bg-transparent border-none text-content-muted text-[1.05rem] cursor-pointer hover:text-content transition-colors"
+              @click="close" aria-label="Chiudi">✕</button>
             <Login @login="handleLogin" />
           </div>
         </div>
@@ -30,8 +34,8 @@ const showLogin = ref(false)
 const close = () => (showLogin.value = false)
 
 const handleLogin = async () => {
-  showLogin.value = false  
-  await router.push('/dashboard') 
+  showLogin.value = false
+  await router.push('/dashboard')
 }
 
 const onKey = (e) => e.key === 'Escape' && close()
@@ -54,39 +58,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   overflow: hidden;
 }
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 23, 42, 0.6);
-  z-index: 9999;
-  padding: 1.25rem;
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  padding: 1rem;
-  position: relative;
-  border: 4px solid rgba(188, 108, 37, 0.12);
-}
-
-.modal-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: transparent;
-  border: none;
-  font-size: 1.05rem;
-  cursor: pointer;
-  color: #374151;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity .18s ease;
@@ -97,14 +68,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   opacity: 0;
 }
 
-@media (max-width:768px) {
+@media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
-  }
-
-  .modal-card {
-    max-width: 100%;
-    margin: 0 .5rem;
   }
 }
 </style>

@@ -22,8 +22,12 @@
     </div>
 
     <div class="book-card__footer">
-      <button class="btn btn-secondary" type="button" @click="onCancel">Annulla</button>
-      <button class="btn btn-primary" type="button" :disabled="!canSave" @click="onSave">Salva</button>
+      <button
+        class="px-3 py-1.5 rounded text-sm cursor-pointer bg-surface-muted text-content border border-border hover:bg-border-strong transition-colors"
+        type="button" @click="onCancel">Annulla</button>
+      <button
+        class="px-3 py-1.5 rounded text-sm cursor-pointer bg-primary text-content-inverse border-none hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        type="button" :disabled="!canSave" @click="onSave">Salva</button>
     </div>
   </div>
 </template>
@@ -83,8 +87,8 @@ function onCancel() {
 
 <style scoped>
 .book-card {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--background);
+  border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   padding: 1rem;
@@ -102,6 +106,7 @@ function onCancel() {
 .book-card__title {
   margin: 0;
   font-size: 1.1rem;
+  color: var(--foreground);
 }
 
 .book-card__body {
@@ -117,14 +122,24 @@ function onCancel() {
 
 label {
   font-size: 0.9rem;
+  color: var(--foreground);
 }
 
 .form-control {
   display: block;
   width: 100%;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.375rem 0.5rem;
+  color: var(--foreground);
+  background: var(--background);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15);
 }
 
 .book-card__footer {
@@ -133,4 +148,3 @@ label {
   gap: 0.5rem;
 }
 </style>
-
