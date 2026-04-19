@@ -1,50 +1,73 @@
 <template>
-  <aside class="sidebar">
-    <div class="sidebar-content">
-      
-      <div class="sidebar-header">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-        <h2>Ricerca</h2>
-      </div>
+  <aside class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
+    <button
+      v-if="collapsed"
+      type="button"
+      class="btn-icon sidebar-expand-btn"
+      @click="emit('toggle')"
+      aria-label="Mostra sidebar"
+      title="Mostra sidebar"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6"></path>
+      </svg>
+    </button>
 
-      <div class="search-section">
-        <div class="search-input-wrapper">
-          <input type="text" v-model="searchQuery" @input="onSearchChange" placeholder="Cerca libri..."
-            class="search-input" />
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2">
+    <div class="sidebar-inner" :aria-hidden="collapsed">
+      <div class="flex items-center gap-3 pb-3 mb-3 border-b border-border">
+        <span class="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 text-primary shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
+        </span>
+        <h2 class="text-lg font-semibold m-0 text-content tracking-tight flex-1">Ricerca</h2>
+        <button
+          type="button"
+          class="btn-icon"
+          @click="emit('toggle')"
+          aria-label="Nascondi sidebar"
+          title="Nascondi sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-2">
+        <div class="relative">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-subtle pointer-events-none"
+            xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" v-model="searchQuery" @input="onSearchChange" placeholder="Cerca libri..."
+            class="field-input !pl-10" />
         </div>
       </div>
 
-      <div class="filters-section">
-        <h3>Filtri</h3>
+      <div class="my-3">
+        <div class="space-y-5">
+          <div>
+            <label for="author-filter" class="block text-content text-sm font-medium mb-2">Autore:</label>
+            <input id="author-filter" type="text" v-model="authorFilter" @input="onFilterChange"
+              placeholder="Nome autore" class="field-input" />
+          </div>
 
-        <div class="filter-group">
-          <label for="author-filter">Autore</label>
-          <input id="author-filter" type="text" v-model="authorFilter" @input="onFilterChange" placeholder="Nome autore"
-            class="filter-input" />
+          <div class="my-3">
+            <label for="year-filter" class="block text-content text-sm font-medium mb-2">Anno di pubblicazione:</label>
+            <input id="year-filter" type="number" v-model="yearFilter" @input="onFilterChange"
+              placeholder="Es. 1998" class="field-input" min="1000" max="2100" />
+          </div>
         </div>
 
-        <div class="filter-group">
-          <label for="year-filter">Anno di pubblicazione</label>
-          <input id="year-filter" type="number" v-model="yearFilter" @input="onFilterChange" placeholder="Anno"
-            class="filter-input" min="1000" max="2100" />
-        </div>
-
-        <button @click="clearFilters" class="clear-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
-          Cancella filtri
+        <button @click="clearFilters" class="btn btn-red w-full mt-8">
+          <span>Reset filtri</span>
         </button>
       </div>
     </div>
@@ -54,11 +77,15 @@
 <script setup lang="js">
 import { ref } from 'vue'
 
+defineProps({
+  collapsed: { type: Boolean, default: false }
+})
+
 const searchQuery = ref('')
 const authorFilter = ref('')
 const yearFilter = ref('')
 
-const emit = defineEmits(['search', 'filter-change'])
+const emit = defineEmits(['search', 'filter-change', 'toggle'])
 
 const onSearchChange = () => {
   emit('search', searchQuery.value)
@@ -76,164 +103,95 @@ const clearFilters = () => {
   authorFilter.value = ''
   yearFilter.value = ''
   emit('search', '')
-  emit('filter-change', {
-    author: '',
-    year: ''
-  })
+  emit('filter-change', { author: '', year: '' })
 }
 </script>
 
 <style scoped>
 .sidebar {
-  width: 280px;
-  height: 100%;
-  background: #bc6c25;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-}
-
-.sidebar-content {
-  padding: 1.5rem;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: white;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-header svg {
-  flex-shrink: 0;
-}
-
-.sidebar-header h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.search-section {
-  margin-bottom: 2rem;
-}
-
-.search-input-wrapper {
   position: relative;
+  width: 300px;
+  flex-shrink: 0;
+  height: 100%;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  transition:
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 320ms ease;
 }
 
-.search-input {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 0.95rem;
-  outline: none;
-  transition: all 0.2s ease;
+.sidebar-inner {
+  width: 300px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.75rem 1.5rem 2rem;
+  transition: opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.search-input:focus {
-  border-color: white;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+.sidebar-collapsed {
+  width: 64px;
 }
 
-.search-input::placeholder {
-  color: #9ca3af;
-}
-
-.search-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
+.sidebar-collapsed .sidebar-inner {
+  opacity: 0;
+  transform: translateX(-12px);
   pointer-events: none;
 }
 
-.filters-section h3 {
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 1rem 0;
+.sidebar-expand-btn {
+  position: absolute;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
 }
 
-.filter-group {
-  margin-bottom: 1.25rem;
-}
-
-.filter-group label {
-  display: block;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-.filter-input {
+.field-input {
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 0.7rem 0.9rem;
   font-size: 0.9rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--foreground);
   outline: none;
-  transition: all 0.2s ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
-.filter-input:focus {
-  border-color: white;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+.field-input::placeholder {
+  color: var(--color-content-subtle, #80848E);
 }
 
-.filter-input::placeholder {
-  color: #9ca3af;
+.field-input:hover {
+  border-color: var(--color-border-strong, #c4c9d2);
 }
 
-.clear-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.field-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.15);
 }
 
-.clear-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: white;
+.btn-red {
+    background-color: red;
+    color: white;
 }
 
-.clear-button:active {
-  transform: scale(0.98);
+.btn-red:hover {
+    background-color: #cc0000;
+    color: white;
 }
 
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    min-height: auto;
-    position: relative;
   }
-
-  .sidebar-content {
-    padding: 1rem;
+  .sidebar-inner {
+    width: 100%;
   }
-
-  .sidebar-header h2 {
-    font-size: 1.1rem;
+  .sidebar-collapsed {
+    width: 64px;
   }
 }
 </style>
