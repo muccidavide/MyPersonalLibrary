@@ -1,5 +1,5 @@
 <template>
-  <div class="books-grid-component flex flex-col h-full min-h-0">
+  <div class="books-grid-component flex flex-col lg:h-full lg:min-h-0">
     <div v-if="isLoading" class="flex-1 flex items-center justify-center text-content-muted">
       Caricamento in corso...
     </div>
@@ -8,7 +8,7 @@
       Nessun libro trovato.
     </div>
 
-    <div v-else class="flex-1 min-h-0 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4 lg:flex-1 lg:min-h-0">
       <article
         v-for="book in books"
         :key="book.id"

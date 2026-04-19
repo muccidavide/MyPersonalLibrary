@@ -183,15 +183,26 @@ const clearFilters = () => {
     color: white;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   .sidebar {
     width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
   .sidebar-inner {
     width: 100%;
+    height: auto;
+    padding: 1.25rem 1rem 1.5rem;
   }
   .sidebar-collapsed {
-    width: 64px;
+    width: 100%;
+    height: 52px;
+  }
+  .sidebar-expand-btn {
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
   }
 }
 </style>
