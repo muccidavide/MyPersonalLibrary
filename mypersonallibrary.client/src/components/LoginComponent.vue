@@ -20,11 +20,14 @@
       <div class="actions">
         <button type="submit" :disabled="loading" class="btn-primary">
           <span v-if="!loading">Accedi</span>
-          <span v-else>Accesso in corso…</span>
+          <span v-else class="loader-wrap">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Accesso in corso…</span>
+          </span>
         </button>
       </div>
 
-      <div v-if="submitError" class="submit-error">{{ submitError }}</div>
+      <div v-if="submitError" class="submit-error" role="alert">{{ submitError }}</div>
     </form>
   </div>
 </template>
@@ -68,40 +71,42 @@ async function onSubmit() {
   if (!validate()) return
 
   loading.value = true
+  submitError.value = ''
   try {
-
     const payload = {
       email: email.value,
       password: password.value
-    };
+    }
 
-    fetch(`${API_BASE_URL}/api/authentication/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/authentication/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
 
-        const data = await response.json();
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('expiresAt', data.accessTokenExpiresAtUtc);
-        localStorage.setItem('user', JSON.stringify(data.user));
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 400) {
+        submitError.value = 'Email o password non corretti.'
+        errors.email = ' '
+        errors.password = ' '
+      } else {
+        submitError.value = 'Errore durante l\'accesso. Riprova.'
+      }
+      return
+    }
 
-        emit('login')
-        return data;
-      })
-      .catch((error) => {
-        console.error('Login error:', error);
-      });
+    const data = await response.json()
+    localStorage.setItem('accessToken', data.accessToken)
+    localStorage.setItem('refreshToken', data.refreshToken)
+    localStorage.setItem('expiresAt', data.accessTokenExpiresAtUtc)
+    localStorage.setItem('user', JSON.stringify(data.user))
+
+    emit('login')
   } catch (err) {
-    submitError.value = 'Errore durante l\'invio. Riprova.'
-    console.error('Errore durante l\'invio', err)
+    submitError.value = 'Impossibile contattare il server. Riprova.'
+    console.error('Login error:', err)
   } finally {
     loading.value = false
   }
@@ -189,10 +194,34 @@ input:focus {
   cursor: default;
 }
 
+.loader-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--primary-foreground);
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .submit-error {
   margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
   text-align: center;
   color: var(--destructive);
+  background: rgba(180, 74, 192, 0.08);
+  border: 1px solid var(--destructive);
+  border-radius: 6px;
   font-size: 0.9rem;
 }
 </style>
