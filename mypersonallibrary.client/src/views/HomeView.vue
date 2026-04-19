@@ -156,6 +156,7 @@ onBeforeUnmount(() => {
     padding: 1.5rem 2rem;
     display: flex;
     flex-direction: column;
+    background: var(--background);
     transition: padding 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -168,5 +169,19 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     transition: max-width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 1023px) {
+    .main-content {
+        overflow: visible;
+        min-height: 0;
+        flex: 1 0 auto;
+        padding: 1rem;
+    }
+
+    .main-wrapper {
+        flex: 1 0 auto;
+        min-height: 0;
+    }
 }
 </style>
