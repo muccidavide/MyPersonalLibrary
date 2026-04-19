@@ -52,13 +52,15 @@
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-weight: normal;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+  }
 }
 
 body {
@@ -68,22 +70,36 @@ body {
   transition:
     color 0.5s,
     background-color 0.5s;
-  line-height: 1.6;
+  line-height: 1.55;
   font-family:
-    Inter,
+    'Inter',
     -apple-system,
     BlinkMacSystemFont,
+    'SF Pro Text',
     'Segoe UI',
+    system-ui,
     Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
     'Helvetica Neue',
     sans-serif;
   font-size: 15px;
+  font-feature-settings: 'cv11', 'ss01', 'ss03', 'cv02';
+  letter-spacing: -0.01em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family:
+    'Inter Tight',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Display',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  font-feature-settings: 'cv11', 'ss01';
 }
