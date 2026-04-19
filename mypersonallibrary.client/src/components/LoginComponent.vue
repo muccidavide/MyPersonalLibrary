@@ -114,14 +114,14 @@ async function onSubmit() {
   margin: 1rem auto;
   padding: 1.25rem;
   border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  background: var(--background);
 }
 
 .title {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
   text-align: center;
+  color: var(--foreground);
 }
 
 .form-group {
@@ -133,23 +133,33 @@ async function onSubmit() {
 label {
   font-weight: 600;
   margin-bottom: 0.25rem;
+  color: var(--foreground);
 }
 
 input {
   padding: 0.6rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.95rem;
+  color: var(--foreground);
+  background: var(--background);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15);
 }
 
 .input-error {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px rgba(180, 74, 192, 0.1);
 }
 
 .error {
   margin-top: 0.35rem;
-  color: #ef4444;
+  color: var(--destructive);
   font-size: 0.85rem;
 }
 
@@ -160,13 +170,18 @@ input {
 }
 
 .btn-primary {
-  background: #bc6c25;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   padding: 0.6rem 1rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover:not([disabled]) {
+  background: #4752C4;
 }
 
 .btn-primary[disabled] {
@@ -177,7 +192,7 @@ input {
 .submit-error {
   margin-top: 0.75rem;
   text-align: center;
-  color: #b91c1c;
+  color: var(--destructive);
   font-size: 0.9rem;
 }
 </style>
