@@ -5,6 +5,23 @@
     </div>
 
     <div class="book-card__body">
+      <div class="book-card__cover-wrapper">
+        <div class="book-card__cover">
+          <img
+            v-if="editableBook.imageUrl"
+            :src="editableBook.imageUrl"
+            :alt="editableBook.title || 'Cover libro'"
+            class="book-card__cover-img"
+          />
+          <div
+            v-else
+            class="book-card__cover-fallback"
+            role="img"
+            :aria-label="editableBook.title || 'Cover libro'"
+          ></div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="title">Titolo</label>
         <input id="title" type="text" class="form-control" v-model.trim="editableBook.title" />
@@ -49,6 +66,7 @@ const editableBook = reactive({
   title: props.book?.title ?? '',
   authors: props.book?.authors ?? '',
   originalPublicationYear: props.book?.originalPublicationYear ?? null,
+  imageUrl: props.book?.imageUrl ?? '',
 })
 
 watch(
@@ -59,6 +77,7 @@ watch(
     editableBook.title = newBook.title ?? ''
     editableBook.authors = newBook.authors ?? ''
     editableBook.originalPublicationYear = newBook.originalPublicationYear ?? null
+    editableBook.imageUrl = newBook.imageUrl ?? ''
   },
   { deep: false }
 )
@@ -76,6 +95,7 @@ function onSave() {
     title: editableBook.title?.trim() ?? '',
     authors: editableBook.authors?.trim() ?? '',
     originalPublicationYear: editableBook.originalPublicationYear,
+    imageUrl: editableBook.imageUrl ?? '',
   }
   emit('save', payload)
 }
@@ -113,6 +133,33 @@ function onCancel() {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
+}
+
+.book-card__cover-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.book-card__cover {
+  width: 10rem;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--surface-muted, #f3f4f6);
+}
+
+.book-card__cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-card__cover-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #4752C4 0%, #7A84F6 100%);
 }
 
 .form-group {
