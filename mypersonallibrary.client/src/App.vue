@@ -72,11 +72,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   .app-container {
     height: auto;
     min-height: 100vh;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   .content-wrapper {
     flex-direction: column;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 </style>

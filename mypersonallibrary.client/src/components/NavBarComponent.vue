@@ -1,9 +1,9 @@
 <template>
   <header class="bg-primary shadow-md sticky top-0 z-40">
     <div
-      class="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between gap-6"
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-6"
     >
-      <div class="flex items-center gap-3 text-content-inverse">
+      <div class="flex items-center gap-3 text-content-inverse min-w-0 flex-1">
         <span
           class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm shrink-0"
         >
@@ -22,12 +22,12 @@
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
           </svg>
         </span>
-        <h1 class="text-lg sm:text-xl font-bold m-0 tracking-tight">
+        <h1 class="text-base sm:text-xl font-bold m-0 tracking-tight truncate min-w-0">
           MyPersonalLibrary
         </h1>
       </div>
 
-      <nav class="flex items-center gap-3">
+      <nav class="flex items-center gap-3 shrink-0">
         <button
           v-if="!isLoggedIn"
           class="btn btn-login"
